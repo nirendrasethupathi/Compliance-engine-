@@ -1,290 +1,216 @@
 @extends('compliance.layouts.preview')
 
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>FORM 17 - Health Register</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            padding: 12px;
-            font-size: 9px;
+            font-size: 8px;
+            padding: 8px;
         }
         .form-container {
-            border: 1px solid black;
+            border: 2px solid black;
             padding: 10px;
-            margin: 0 auto;
-            width: 99%;
         }
+
+        /* ── Header ── */
         .form-header {
             text-align: center;
-            margin-bottom: 12px;
-            font-size: 10px;
-        }
-        .form-header div {
-            margin: 2px 0;
-        }
-        .header-title {
-            font-weight: bold;
-        }
-        .certifying-surgeon-section {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             font-size: 9px;
+            line-height: 1.6;
         }
-        .surgeon-line {
-            margin: 4px 0;
+        .red-bold  { font-weight: bold; color: #c00; }
+        .black-bold{ font-weight: bold; }
+
+        /* ── Certifying Surgeon ── */
+        .surgeon-section { margin-bottom: 10px; font-size: 8.5px; }
+        .surgeon-section .sec-title { font-weight: bold; margin-bottom: 4px; }
+        .surgeon-row {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
+            margin-bottom: 6px;
+            gap: 6px;
         }
-        .surgeon-label {
-            width: 30px;
-            font-weight: bold;
-        }
-        .surgeon-name {
+        .surgeon-label { font-weight: bold; width: 20px; flex-shrink: 0; }
+        .surgeon-name-line {
             flex: 1;
-            border-bottom: 1px solid black;
-            margin: 0 8px;
-            height: 16px;
+            border-bottom: 1px solid #000;
+            min-height: 14px;
         }
-        .surgeon-period {
-            display: flex;
-            gap: 20px;
-            margin-left: 20px;
-        }
-        .period-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .period-label {
-            width: 40px;
-        }
-        .period-line {
-            border-bottom: 1px solid black;
-            width: 80px;
-            height: 16px;
-        }
+        .period-group { display: flex; gap: 16px; flex-shrink: 0; }
+        .period-item  { display: flex; align-items: flex-end; gap: 4px; }
+        .period-item span { white-space: nowrap; }
+        .period-line  { border-bottom: 1px solid #000; width: 80px; min-height: 14px; }
+
+        /* ── Main Table ── */
         .register-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid black;
-            font-size: 8px;
+            font-size: 6.5px;
             margin-bottom: 8px;
             table-layout: fixed;
         }
         .register-table th,
         .register-table td {
             border: 1px solid black;
-            padding: 2px 2px;
+            padding: 2px 3px;
             text-align: center;
             vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .register-table th {
             font-weight: bold;
-            background-color: #fff;
+            background: #fff;
             line-height: 1.2;
-            min-height:28px;
-            padding: 4px 3px;
-            word-wrap: break-word;
+            vertical-align: middle;
         }
-        .register-table td {
-            height: 20px;
-        }
-        .col-name,
-        .col-reason,
-        .col-suspend{
-            text-align:left;
-            padding-left:4px;
-        }
-        .col-sl { width:4%; }
-        .col-works { width:6%; }
-        .col-name { width:12%; }
-        .col-sex { width:4%; }
-        .col-age { width:5%; }
-        .col-employ { width:9%; }
-        .col-leaving { width:9%; }
-        .col-reason { width:11%; }
-        .col-nature { width:11%; }
-        .col-material { width:10%; }
+        .register-table td { height: 18px; }
 
-        .col-medical { width:7%; }
-        .col-suspend { width:4%; }
-        .col-recert { width:4%; }
-        .col-unfitness { width:4%; }
-        .col-signature { width:4%; }
-        .notes-section {
-            margin-top: 12px;
-            font-size: 8px;
-            line-height: 1.4;
-        }
-        .notes-section div {
-            margin: 2px 0;
-        }
+        /* Column widths — total = 100% */
+        .c1  { width: 3%;  }
+        .c2  { width: 5%;  }
+        .c3  { width: 15%; }
+        .c4  { width: 3%;  }
+        .c5  { width: 4%;  }
+        .c6  { width: 7%;  }
+        .c7  { width: 7%;  }
+        .c8  { width: 7%;  }
+        .c9  { width: 7%;  }
+        .c10 { width: 7%;  }
+        .c11 { width: 7%;  }
+        .c12 { width: 7%;  }
+        .c13 { width: 7%;  }
+        .c14 { width: 7%;  }
+        .c15 { width: 6%;  }
+
+        /* Name cell — single line */
+        .td-name { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .td-left { text-align: left; }
+        .td-nowrap { white-space: nowrap; }
+
+        /* ── Notes ── */
+        .notes-section { margin-top: 8px; font-size: 7.5px; line-height: 1.5; }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <!-- Header -->
-        <div class="form-header">
-            <div>The Tamil Nadu Factories Rules</div>
-            <div class="header-title">FORM 17</div>
-            <div>(Prescribed under Rule 14)</div>
-            <div class="header-title">Health Register</div>
-            <div style="margin-top: 4px; font-size: 9px;">(In respect of persons employed in occupations declared to be dangerous operations under section 87)</div>
-        </div>
+<div class="form-container">
 
-        <!-- Certifying Surgeon Section -->
-        <div class="certifying-surgeon-section">
-            <div style="font-weight: bold; margin-bottom: 6px;">Name of Certifying Surgeon:</div>
-            <div class="surgeon-line">
-                <div class="surgeon-label">(a)</div>
-                <div class="surgeon-name">{{ $certifying_surgeons[0]['name'] ?? '' }}</div>
-                <div class="surgeon-period">
-                    <div class="period-item">
-                        <div class="period-label">From</div>
-                        <div class="period-line">{{ $certifying_surgeons[0]['from_date'] ?? '' }}</div>
-                    </div>
-                    <div class="period-item">
-                        <div class="period-label">To</div>
-                        <div class="period-line">{{ $certifying_surgeons[0]['to_date'] ?? '' }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="surgeon-line">
-                <div class="surgeon-label">(b)</div>
-                <div class="surgeon-name">{{ $certifying_surgeons[1]['name'] ?? '' }}</div>
-                <div class="surgeon-period">
-                    <div class="period-item">
-                        <div class="period-label">From</div>
-                        <div class="period-line">{{ $certifying_surgeons[1]['from_date'] ?? '' }}</div>
-                    </div>
-                    <div class="period-item">
-                        <div class="period-label">To</div>
-                        <div class="period-line">{{ $certifying_surgeons[1]['to_date'] ?? '' }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="surgeon-line">
-                <div class="surgeon-label">(c)</div>
-                <div class="surgeon-name">{{ $certifying_surgeons[2]['name'] ?? '' }}</div>
-                <div class="surgeon-period">
-                    <div class="period-item">
-                        <div class="period-label">From</div>
-                        <div class="period-line">{{ $certifying_surgeons[2]['from_date'] ?? '' }}</div>
-                    </div>
-                    <div class="period-item">
-                        <div class="period-label">To</div>
-                        <div class="period-line">{{ $certifying_surgeons[2]['to_date'] ?? '' }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Table 1: Columns 1-10 -->
-        <table class="register-table">
-            <thead>
-                <tr>
-                    <th class="col-sl">Sl.No</th>
-                    <th class="col-works">Works No.</th>
-                    <th class="col-name">Name of Worker</th>
-                    <th class="col-sex">Sex</th>
-                    <th class="col-age">Age (last birthday)</th>
-                    <th class="col-employ">Date of employment on present work</th>
-                    <th class="col-leaving">Date of leaving or transfer to other work</th>
-                    <th class="col-reason">Reason for leaving, transfer or discharge</th>
-                    <th class="col-nature">Nature of job, or occupation</th>
-                    <th class="col-material">Raw Material or by-product handled</th>
-                    <th class="col-medical">Result of Medical Examination</th>
-                    <th class="col-suspend">If suspended from work, state period of suspension with detailed reasons</th>
-                    <th class="col-recert">Recertified fit to resume duty on (with signature of Certifying Surgeon)</th>
-                    <th class="col-unfitness">If certificate of unfitness or suspension issued to workers</th>
-                    <th class="col-signature">Signature with date of Certifying Surgeon</th>
-                </tr>
-                <tr>
-                    <th class="col-sl">(1)</th>
-                    <th class="col-works">(2)</th>
-                    <th class="col-name">(3)</th>
-                    <th class="col-sex">(4)</th>
-                    <th class="col-age">(5)</th>
-                    <th class="col-employ">(6)</th>
-                    <th class="col-leaving">(7)</th>
-                    <th class="col-reason">(8)</th>
-                    <th class="col-nature">(9)</th>
-                    <th class="col-material">(10)</th>
-                    <th class="col-medical">(11)</th>
-                    <th class="col-suspend">(12)</th>
-                    <th class="col-recert">(13)</th>
-                    <th class="col-unfitness">(14)</th>
-                    <th class="col-signature">(15)</th>
-
-                </tr>
-            </thead>
-            <tbody>
-
-                @if($is_nil)
-                    <tr>
-                        <td colspan="15" style="text-align: center; font-weight: bold;">NIL</td>
-                    </tr>
-                @else
-                    @foreach($rows as $row)
-                        <tr>
-                            <td>{{ $row['sl_no'] }}</td>
-                            <td>{{ $row['works_no'] }}</td>
-                            <td class="col-name">{{ $row['name_of_worker'] }}</td>
-                            <td>{{ $row['sex'] }}</td>
-                            <td>{{ $row['age_last_birthday'] }}</td>
-                            <td>{{ $row['date_of_employment_on_present_work'] }}</td>
-                            <td>{{ $row['date_of_leaving_or_transfer'] }}</td>
-                            <td class="col-reason">{{ $row['reason_for_leaving_transfer_or_discharge'] }}</td>
-                            <td>{{ $row['nature_of_job_or_occupation'] }}</td>
-                            <td>{{ $row['raw_material_or_byproduct_handled'] }}</td>
-                            <td>{{ $row['result_of_medical_examination'] }}</td>
-                            <td class="col-suspend">{{ $row['suspension_period_with_reasons'] }}</td>
-                            <td>{{ $row['recertified_fit_to_resume_duty_on'] }}</td>
-                            <td>{{ $row['certificate_of_unfitness_or_suspension_issued'] }}</td>
-                            <td>{{ $row['signature_with_date_of_certifying_surgeon'] }}</td>
-                        </tr>
-                    @endforeach
-                    
-                    @php
-                        $fillerRows = max(0, 12 - count($rows));
-                    @endphp
-                    
-                    @for($i = 0; $i < $fillerRows; $i++)
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    @endfor
-                @endif
-
-            </tbody>
-        </table>
-
-        <!-- Notes Section -->
-        <div class="notes-section">
-            <div><strong>Note:</strong></div>
-            <div>(i) Column (8) – Detailed Summary of reasons for transfer or discharge should be stated</div>
-            <div>(ii) Column (11) – Should be expressed as fit/unfit/suspended</div>
-        </div>
+    <!-- Header -->
+    <div class="form-header">
+        <div class="red-bold">The Tamil Nadu Factories Rules</div>
+        <div class="black-bold">FORM 17</div>
+        <div>(Prescribed under Rule 14)</div>
+        <div class="black-bold">Health Register</div>
+        <div style="font-size:8px;">(In respect of persons employed in occupations declared to be dangerous operations under section 87)</div>
     </div>
+
+    <!-- Certifying Surgeon -->
+    <div class="surgeon-section">
+        <div class="sec-title">Name of Certifying Surgeon:</div>
+
+        @foreach(['a','b','c'] as $i => $letter)
+        <div class="surgeon-row">
+            <div class="surgeon-label">({{ $letter }})</div>
+            <div class="surgeon-name-line">{{ $certifying_surgeons[$i]['name'] ?? '' }}</div>
+            <div class="period-group">
+                <div class="period-item">
+                    <span>From</span>
+                    <div class="period-line">{{ $certifying_surgeons[$i]['from_date'] ?? '' }}</div>
+                </div>
+                <div class="period-item">
+                    <span>To</span>
+                    <div class="period-line">{{ $certifying_surgeons[$i]['to_date'] ?? '' }}</div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+
+    <!-- Register Table -->
+    <table class="register-table">
+        <thead>
+            <tr>
+                <th class="c1">Sl.<br>No</th>
+                <th class="c2">Works<br>No.</th>
+                <th class="c3">Name of Worker</th>
+                <th class="c4">Sex</th>
+                <th class="c5">Age<br>(last b'day)</th>
+                <th class="c6">Date of<br>employment<br>on present<br>work</th>
+                <th class="c7">Date of<br>leaving or<br>transfer to<br>other work</th>
+                <th class="c8">Reason for<br>leaving,<br>transfer or<br>discharge</th>
+                <th class="c9">Nature of<br>job, or<br>occupation</th>
+                <th class="c10">Raw Material<br>or by-product<br>handled</th>
+                <th class="c11">Result of<br>Medical Exam.</th>
+                <th class="c12">If suspended<br>from work,<br>state period<br>with detailed<br>reasons</th>
+                <th class="c13">Recertified<br>fit to resume<br>duty on<br>(with sign. of<br>Cert. Surgeon)</th>
+                <th class="c14">If certificate<br>of unfitness<br>or suspension<br>issued to<br>workers</th>
+                <th class="c15">Signature<br>with date<br>of Cert.<br>Surgeon</th>
+            </tr>
+            <tr>
+                <th class="c1">(1)</th>
+                <th class="c2">(2)</th>
+                <th class="c3">(3)</th>
+                <th class="c4">(4)</th>
+                <th class="c5">(5)</th>
+                <th class="c6">(6)</th>
+                <th class="c7">(7)</th>
+                <th class="c8">(8)</th>
+                <th class="c9">(9)</th>
+                <th class="c10">(10)</th>
+                <th class="c11">(11)</th>
+                <th class="c12">(12)</th>
+                <th class="c13">(13)</th>
+                <th class="c14">(14)</th>
+                <th class="c15">(15)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if($is_nil)
+                <tr><td colspan="15" style="text-align:center;font-weight:bold;padding:10px;">NIL</td></tr>
+            @else
+                @foreach($rows as $row)
+                <tr>
+                    <td>{{ $row['sl_no'] }}</td>
+                    <td>{{ $row['works_no'] }}</td>
+                    <td class="td-name">{{ $row['name_of_worker'] }}</td>
+                    <td class="td-nowrap">{{ $row['sex'] }}</td>
+                    <td>{{ $row['age_last_birthday'] }}</td>
+                    <td>{{ $row['date_of_employment_on_present_work'] }}</td>
+                    <td>{{ $row['date_of_leaving_or_transfer'] }}</td>
+                    <td class="td-left">{{ $row['reason_for_leaving_transfer_or_discharge'] }}</td>
+                    <td>{{ $row['nature_of_job_or_occupation'] }}</td>
+                    <td>{{ $row['raw_material_or_byproduct_handled'] }}</td>
+                    <td>{{ $row['result_of_medical_examination'] }}</td>
+                    <td class="td-left">{{ $row['suspension_period_with_reasons'] }}</td>
+                    <td>{{ $row['recertified_fit_to_resume_duty_on'] }}</td>
+                    <td>{{ $row['certificate_of_unfitness_or_suspension_issued'] }}</td>
+                    <td>{{ $row['signature_with_date_of_certifying_surgeon'] }}</td>
+                </tr>
+                @endforeach
+
+                @for($i = 0; $i < max(0, 3 - count($rows)); $i++)
+                <tr>
+                    @for($c = 0; $c < 15; $c++)<td></td>@endfor
+                </tr>
+                @endfor
+            @endif
+        </tbody>
+    </table>
+
+    <!-- Notes -->
+    <div class="notes-section">
+        <strong>Note:</strong><br>
+        (i) Column (8) – Detailed Summary of reasons for transfer or discharge should be stated<br>
+        (ii) Column (11) – Should be expressed as fit/unfit/suspended
+    </div>
+
+</div>
 </body>
 </html>

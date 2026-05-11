@@ -12,14 +12,16 @@
         }
         body {
             font-family: 'Times New Roman', Times, serif;
-            padding: 12px;
+            padding: 5px;
             font-size: 9px;
         }
         .form-container {
             border: 1px solid black;
-            padding: 10px;
-            margin: 0 auto;
-            width: 99%;
+            padding: 8px;
+            margin: 0;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
         }
         .form-header {
             text-align: center;
@@ -50,9 +52,10 @@
         }
         .register-table {
             width: 100%;
+            max-width: 100%;
             border-collapse: collapse;
             font-size: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 0;
             table-layout: fixed;
         }
         .register-table th,
@@ -73,36 +76,16 @@
         .register-table td {
             text-align: left;
         }
-        .col-sl {
-            width: 5%;
-        }
-        .col-name {
-            width: 12%;
-        }
-        .col-father {
-            width: 16%;
-        }
-        .col-amount {
-            width: 12%;
-        }
-        .col-purpose {
-            width: 12%;
-        }
-        .col-install {
-            width: 12%;
-        }
-        .col-postpone {
-            width: 10%;
-        }
-        .col-repaid {
-            width: 10%;
-        }
-        .col-sign {
-            width: 7%;
-        }
-        .col-remarks {
-            width: 4%;
-        }
+        .col-sl { width: 4%; }
+        .col-name { width: 11%; }
+        .col-father { width: 13%; }
+        .col-amount { width: 11%; }
+        .col-purpose { width: 11%; }
+        .col-install { width: 13%; }
+        .col-postpone { width: 10%; }
+        .col-repaid { width: 10%; }
+        .col-sign { width: 12%; }
+        .col-remarks { width: 5%; }
         .text-center {
             text-align: center;
         }

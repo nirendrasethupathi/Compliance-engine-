@@ -7,52 +7,53 @@
         * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
         body {
             font-family: 'Times New Roman', Times, serif;
-            padding: 12px;
-            font-size: 9px;
+            padding: 20px;
+            font-size: 11px;
         }
         .form-container {
-            border: 1px solid black;
-            padding: 10px;
+            border: 2px solid black;
+            width: 100%;
+            max-width: 1200px;
             margin: 0 auto;
-            width: 99%;
         }
         .form-header {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 10px;
+            padding: 15px;
+            border-bottom: 2px solid black;
+            font-size: 12px;
+            font-weight: bold;
         }
         .form-header div {
-            margin: 2px 0;
+            margin: 3px 0;
         }
         .header-title {
             font-weight: bold;
+            font-size: 14px;
         }
         .register-table {
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid black;
-            font-size: 8px;
-            margin-bottom: 8px;
+            font-size: 10px;
         }
         .register-table th,
         .register-table td {
             border: 1px solid black;
-            padding: 2px 2px;
+            padding: 6px 8px;
             text-align: left;
             vertical-align: middle;
         }
         .register-table th {
             font-weight: bold;
             background-color: #fff;
-            line-height: 1.1;
-            height: 16px;
             text-align: center;
+            padding: 8px;
         }
         .register-table td {
-            height: 20px;
+            min-height: 30px;
         }
         .col-sl { width: 4%; text-align: center; }
         .col-name { width: 28%; }
@@ -64,10 +65,12 @@
         .col-token { width: 10%; text-align: center; }
         .col-remarks { width: 12%; }
         .footer-section {
-            margin-top: 8px;
+            padding: 20px;
+            border-top: 2px solid black;
             display: flex;
             justify-content: space-between;
-            font-size: 9px;
+            align-items: flex-end;
+            min-height: 100px;
         }
         .footer-left {
             flex: 1;
@@ -76,16 +79,9 @@
             flex: 1;
             text-align: right;
         }
-        .signature-line {
-            margin-top: 30px;
-            border-top: 1px solid #000;
-            width: 150px;
-            margin-left: auto;
-        }
         .signature-label {
-            margin-top: 2px;
+            margin-top: 60px;
             font-weight: bold;
-            text-align: right;
         }
     </style>
 </head>
@@ -154,7 +150,6 @@
                 <div>Date: ___________</div>
             </div>
             <div class="footer-right">
-                <div class="signature-line"></div>
                 <div class="signature-label">(Signed) Manager/Occupier</div>
             </div>
         </div>

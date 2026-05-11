@@ -14,21 +14,18 @@ class FormXIIIGenerator extends BaseFormGenerator
         $rows = [];
         foreach ($rawData['records'] ?? [] as $record) {
             $record = $this->normalizeRecord($record);
-            $age = $this->calculateAge($record['date_of_birth'] ?? null) ?? 'NIL';
-            $sex = $record['gender'] ?? 'NIL';
-            
             $rows[] = [
-                'name' => $record['name'] ?? 'NIL',
-                'age' => $age,
-                'sex' => $sex,
-                'father_name' => $record['father_name'] ?? 'NIL',
-                'designation' => $record['designation'] ?? 'NIL',
-                'permanent_address' => $record['permanent_address'] ?? 'NIL',
-                'local_address' => $record['local_address'] ?? 'NIL',
-                'joining_date' => $this->formatDate($record['joining_date'] ?? null) ?? 'NIL',
-                'termination_date' => $this->formatDate($record['termination_date'] ?? null) ?? 'NIL',
-                'termination_reason' => $record['termination_reason'] ?? 'NIL',
-                'remarks' => $record['remarks'] ?? 'NIL',
+                'name' => $record['name'] ?? null,
+                'age' => $this->calculateAge($record['date_of_birth'] ?? null),
+                'sex' => $record['gender'] ?? null,
+                'father_name' => $record['father_name'] ?? null,
+                'designation' => $record['designation'] ?? null,
+                'permanent_address' => $record['permanent_address'] ?? null,
+                'local_address' => $record['local_address'] ?? null,
+                'joining_date' => $this->formatDate($record['joining_date'] ?? null),
+                'termination_date' => $this->formatDate($record['termination_date'] ?? null),
+                'termination_reason' => null,
+                'remarks' => null,
             ];
         }
 
@@ -36,16 +33,16 @@ class FormXIIIGenerator extends BaseFormGenerator
             'header' => [
                 'form_title' => 'FORM XIII - Register of Workmen Employed by Contractor',
                 'period' => $this->formatPeriod($rawData['meta']['month'] ?? 1, $rawData['meta']['year'] ?? 2024),
-                'tenant' => [
-                    'name' => $rawData['tenant']['name'] ?? 'NIL',
-                    'address' => $rawData['tenant']['address'] ?? 'NIL',
-                ],
-                'branch' => [
-                    'name' => $rawData['branch']['name'] ?? 'NIL',
-                    'address' => $rawData['branch']['address'] ?? 'NIL',
-                ],
+                'branch' => $rawData['branch'] ?? [],
+                'tenant' => $rawData['tenant'] ?? [],
             ],
+            'contractor_name' => $rawData['tenant']['establishment_name'] ?? 'NIL',
+            'establishment_name' => $rawData['branch']['name'] ?? 'NIL',
+            'work_nature' => 'Contract Labour',
+            'work_location' => $rawData['branch']['address'] ?? 'NIL',
+            'principal_employer' => $rawData['tenant']['name'] ?? 'NIL',
             'rows' => $rows,
+            'totals' => [],
             'is_nil' => count($rows) === 0,
         ];
     }

@@ -66,9 +66,9 @@ abstract class BaseFormGenerator
 
             $pdf = Pdf::loadView($this->view, $formData)
                 ->setPaper($paper, $orientation)
-                ->setOption('isHtml5ParserEnabled', false)
+                ->setOption('isHtml5ParserEnabled', true)
                 ->setOption('isRemoteEnabled', false)
-                ->setOption('dpi', 72)
+                ->setOption('dpi', 96)
                 ->setOption('defaultFont', 'Arial')
                 ->setOption('chroot', [public_path()]);
 

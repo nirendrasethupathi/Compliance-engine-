@@ -2,132 +2,89 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>FORM XXII - Register of Advances</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>FORM XXII - Register of Advances v2.0</title>
     <style>
+        @page { size: A4 landscape; margin: 8mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 6px;
-            padding: 0;
+            font-size: 8px;
+            padding: 10px;
             margin: 0;
             background: #fff;
             color: #000;
         }
         .form-container {
-            border: 1.5px solid #000;
-            width: 110%;
-            transform: scale(0.55);
-            transform-origin: top center;
-            margin: 40px auto 0;
+            border: 2px solid #000;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-
-        /* Title */
         .form-title {
             text-align: center;
-            padding: 2px 1px;
+            padding: 3px 2px;
             border-bottom: 1px solid #000;
-            line-height: 1.4;
+            line-height: 1.3;
         }
-        .form-title .t1 { font-size: 8px; font-weight: bold; }
-        .form-title .t2 { font-size: 6px; }
-        .form-title .t3 { font-size: 7px; font-weight: bold; }
-
-        /* All tables */
+        .form-title .t1 { font-size: 11px; font-weight: bold; }
+        .form-title .t2 { font-size: 9px; }
+        .form-title .t3 { font-size: 10px; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         td, th {
             border: 1px solid #000;
-            padding: 1px 2px;
-            font-size: 6px;
+            padding: 3px 5px;
+            font-size: 8px;
             vertical-align: middle;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            overflow: hidden;
         }
-
-        /* Info rows 1 & 2 — two-cell */
         .info-table tr.two-cell td {
             border-top: none; border-left: none; border-right: none;
             border-bottom: 1px solid #000;
-            padding: 1px 2px; white-space: normal; vertical-align: middle;
+            padding: 3px 5px; white-space: normal; vertical-align: middle;
         }
-        .info-table tr.two-cell td.lbl {
-            font-weight: bold; font-size: 6px; width: 32%;
-            border-right: 1px solid #000;
-        }
-        .info-table tr.two-cell td.val { font-size: 6px; width: 68%; }
-
-        /* Info rows 3 & 4 — full-width single cell */
+        .info-table tr.two-cell td.lbl { font-weight: bold; font-size: 8px; width: 30%; border-right: 1px solid #000; }
+        .info-table tr.two-cell td.val { font-size: 8px; width: 70%; }
         .info-table tr.one-cell td {
             border-top: none; border-left: none; border-right: none;
             border-bottom: 1px solid #000;
-            padding: 1px 2px; white-space: normal; font-size: 6px;
+            padding: 3px 5px; white-space: normal; font-size: 8px;
         }
         .info-table tr.one-cell td span.lbl { font-weight: bold; }
-
-        /* Month & Year */
         .month-table td {
             border-top: none; border-left: none; border-right: none;
             border-bottom: 1px solid #000;
-            padding: 1px 2px; font-size: 6px; vertical-align: middle;
+            padding: 3px 5px; font-size: 8px; vertical-align: middle;
         }
-        .month-table td.lbl { font-weight: bold; width: 18%; white-space: nowrap; }
+        .month-table td.lbl { font-weight: bold; width: 18%; }
         .month-table td.val { width: 82%; }
-
-        /* Register table */
-        .reg-table { border-top: none; }
+        .reg-table { border-top: none; table-layout: fixed; width: 100%; }
         .reg-table td, .reg-table th {
-            border: 1px solid #000; padding: 1px 2px;
-            font-size: 6px; vertical-align: middle;
-            overflow: hidden; word-wrap: break-word;
+            border: 1px solid #000; padding: 2px 3px;
+            font-size: 8px; vertical-align: middle;
         }
-
-        /* Column number row */
         .reg-table .num-row td {
-            text-align: center; font-weight: bold; font-size: 6px;
-            padding: 1px; height: 10px; color: #000; background: #fff;
+            text-align: center; font-weight: bold; font-size: 8px;
+            padding: 2px; height: 12px; color: #000; background: #fff;
         }
-
-        /* Column heading row */
         .reg-table .hdr-row th {
-            text-align: center; font-weight: bold; font-size: 5.5px;
-            white-space: normal; line-height: 1.2; padding: 1px;
+            text-align: center; font-weight: bold; font-size: 7px;
+            white-space: normal; line-height: 1.1; padding: 1px;
             color: #000; background: #fff; vertical-align: middle;
         }
-
-        /* Data rows */
         .reg-table tbody td {
-            font-size: 6px; height: 11px;
-            white-space: normal; overflow: hidden;
-            word-wrap: break-word;
+            font-size: 8px; height: 18px; vertical-align: middle;
         }
-
-        /* Cell alignment */
-        .td-sl   { text-align: center; font-weight: bold; color: #000; }
-        .td-name { text-align: left; font-weight: bold; color: #000; white-space: normal; }
-        .td-left { text-align: left; color: #000; white-space: normal; }
-        .td-ctr  { text-align: center; color: #000; font-weight: bold; white-space: normal; }
-
-        /* Empty state */
-        .nil-row td { text-align: center; font-weight: bold; font-size: 6px; height: 11px; color: #000; }
-
-        /* Column widths — total 100% */
-        .c1  { width: 1%;  max-width: 1%; }
-        .c2  { width: 30%; }
-        .c3  { width: 11%; }
-        .c4  { width: 11%; }
-        .c5  { width: 8%;  }
-        .c6  { width: 8%;  }
-        .c7  { width: 8%;  }
-        .c8  { width: 8%;  }
-        .c9  { width: 8%;  }
-        .c10 { width: 5%;  }
-        .c11 { width: 2%;  }
-
-        /* Footer rows inside reg-table tfoot */
-        .tfoot-note { text-align: left; font-style: italic; padding: 3px 6px; border: 1px solid #000; font-size: 6px; vertical-align: middle; }
-        .tfoot-nil  { text-align: center; font-weight: bold; padding: 3px 6px; border: 1px solid #000; font-size: 6px; vertical-align: middle; }
-        .tfoot-sig  { text-align: right; padding: 3px 6px; border: 1px solid #000; font-size: 6px; vertical-align: bottom; height: 70px; }
-        .sig-label  { font-size: 6px; font-weight: bold; color: #000; text-align: right; display: block; }
+        .td-sl   { text-align: center; }
+        .td-name { text-align: left; font-size: 7px !important; padding: 2px 0px !important; white-space: nowrap; }
+        .td-left { text-align: left; font-size: 7px; padding: 2px 1px; white-space: nowrap; }
+        .td-ctr  { text-align: center; font-size: 8px; }
+        .nil-row td { text-align: center; font-weight: bold; font-size: 9px; height: 20px; }
+        .tfoot-note { text-align: left; font-style: italic; padding: 4px 6px; border: 1px solid #000; font-size: 8px; vertical-align: middle; }
+        .tfoot-nil  { text-align: center; font-weight: bold; padding: 4px 6px; border: 1px solid #000; font-size: 8px; vertical-align: middle; }
+        .tfoot-sig  { text-align: right; padding: 4px 6px; border: 1px solid #000; font-size: 8px; vertical-align: bottom; height: 60px; }
+        .sig-label  { font-size: 8px; font-weight: bold; color: #000; text-align: right; display: block; }
     </style>
 </head>
 <body>
@@ -179,9 +136,17 @@
     {{-- REGISTER TABLE --}}
     <table class="reg-table">
         <colgroup>
-            <col class="c1"><col class="c2"><col class="c3"><col class="c4">
-            <col class="c5"><col class="c6"><col class="c7"><col class="c8">
-            <col class="c9"><col class="c10"><col class="c11">
+            <col style="width: 4%;">
+            <col style="width: 18%;">
+            <col style="width: 10%;">
+            <col style="width: 11%;">
+            <col style="width: 8%;">
+            <col style="width: 8%;">
+            <col style="width: 9%;">
+            <col style="width: 9%;">
+            <col style="width: 8%;">
+            <col style="width: 13%;">
+            <col style="width: 2%;">
         </colgroup>
         <thead>
             <tr class="num-row">
@@ -191,7 +156,7 @@
             <tr class="hdr-row">
                 <th>SL NO</th>
                 <th>Name of workman</th>
-                <th>Father's/Husban d's name</th>
+                <th>Father's/Husband's name</th>
                 <th>Designation/<br>Nature of<br>employment</th>
                 <th>Date and<br>Amount of<br>Advance Given</th>
                 <th>Date and<br>Amount of<br>Advance Given</th>

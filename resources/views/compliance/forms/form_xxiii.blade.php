@@ -10,57 +10,45 @@
         }
         body {
             font-family: 'Times New Roman', Times, serif;
-            padding: 1px;
+            padding: 20px;
         }
         .form-container {
-            border: 2px solid #000;
-            margin: 1px auto;
-            width: 99%;
+            border: 2px solid black;
+            padding: 15px;
+            margin: 0 auto;
+            width: 95%;
         }
         .form-header {
             text-align: center;
-            padding: 2px 0;
-            line-height: 1.4;
+            margin-bottom: 15px;
+            font-size: 12px;
         }
-        .form-title {
-            font-size: 11px;
+        .form-header div {
+            margin: 3px 0;
+        }
+        .header-title {
             font-weight: bold;
-            line-height: 1.4;
-        }
-        .form-rule {
-            font-size: 8px;
-            line-height: 1.4;
-        }
-        .form-subtitle {
-            font-size: 10px;
-            font-weight: bold;
-            line-height: 1.4;
         }
         .establishment-table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 10px;
             border: 1px solid black;
         }
         .establishment-table td {
             border: 1px solid black;
-            padding: 2px 3px;
-            font-size: 7.5px;
-            line-height: 1.4;
-            vertical-align: middle;
+            padding: 6px 8px;
+            font-size: 11px;
+            vertical-align: top;
         }
         .establishment-table td:first-child {
-            font-size: 7.5px;
             font-weight: bold;
-            line-height: 1.4;
             width: 35%;
-            vertical-align: middle;
         }
         .month-year-row {
             display: flex;
-            align-items: center;
-            font-size: 7.5px;
-            padding: 2px 3px;
-            line-height: 1.4;
+            margin-bottom: 10px;
+            font-size: 11px;
         }
         .month-year-row span:first-child {
             font-weight: bold;
@@ -74,38 +62,37 @@
             border-collapse: collapse;
             border: 1px solid black;
             margin-bottom: 0;
-            table-layout: fixed;
         }
         .column-numbers td {
             border: 1px solid black;
-            padding: 1px 0;
+            padding: 4px 2px;
             text-align: center;
-            font-size: 7px;
+            font-size: 11px;
             font-weight: bold;
-            line-height: 1.4;
-            vertical-align: middle;
+            height: 20px;
         }
         .register-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid black;
-            table-layout: fixed;
+            font-size: 11px;
         }
         .register-table th,
         .register-table td {
             border: 1px solid black;
-            padding: 2px 3px;
+            padding: 5px 4px;
             text-align: left;
-            vertical-align: middle;
-            font-size: 7px;
-            line-height: 1.4;
+            vertical-align: top;
+            font-size: 10px;
         }
-        .register-table thead th {
+        .register-table th {
             font-weight: bold;
             background-color: #fff;
             word-wrap: break-word;
-            vertical-align: middle;
-            text-align: center;
+            line-height: 1.2;
+        }
+        .register-table td {
+            height: 25px;
         }
         .col-1 { width: 4%; text-align: center; }
         .col-2 { width: 8%; }
@@ -119,43 +106,36 @@
         .col-10 { width: 8%; text-align: right; }
         .col-11 { width: 8%; }
         .col-12 { width: 9%; }
-        .no-overtime-row td {
-            text-align: center;
-            font-weight: normal;
-            font-size: 7px;
-            padding: 6px 4px;
-            border: 1px solid #000;
-            vertical-align: middle;
-            line-height: 1.4;
-        }
         .footer-section {
-            margin-top: 2px;
-            padding: 2px 3px;
-            font-size: 7.5px;
-            line-height: 1.4;
+            margin-top: 15px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
         .footer-left {
-            font-size: 7.5px;
+            flex: 1;
         }
-        .signature-section {
-            position: relative;
-            height: 80px;
+        .footer-center {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
         }
-        .signature-label {
-            position: absolute;
-            right: 10px;
-            bottom: 8px;
-            font-size: 7.5px;
+        .footer-right {
+            flex: 1;
             text-align: right;
+        }
+        .signature-space {
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
     <div class="form-container">
         <div class="form-header">
-            <div class="form-title">FORM XXIII</div>
-            <div class="form-rule">[See Rule 78 (1) (a) (iii)]</div>
-            <div class="form-subtitle">Register of Overtime</div>
+            <div class="header-title">FORM XXIII</div>
+            <div>[See Rule 78 (1) (a) (iii)]</div>
+            <div class="header-title">Register of Overtime</div>
         </div>
 
         <table class="establishment-table">
@@ -217,29 +197,26 @@
                 </tr>
             </thead>
             <tbody>
-                @if(!empty($rows))
+                @if(isset($rows) && count($rows) > 0)
                     @foreach($rows as $index => $row)
                         <tr>
                             <td class="col-1">{{ $index + 1 }}</td>
-                            <td class="col-2">{{ $row['name'] ?? 'NIL' }}</td>
-                            <td class="col-3">{{ $row['father_name'] ?? 'NIL' }}</td>
-                            <td class="col-4">{{ $row['sex'] ?? 'NIL' }}</td>
-                            <td class="col-5">{{ $row['designation'] ?? 'NIL' }}</td>
-                            <td class="col-6">{{ $row['overtime_dates'] ?? 'NIL' }}</td>
-                            <td class="col-7">{{ $row['total_overtime'] ?? 'NIL' }}</td>
-                            <td class="col-8">{{ $row['normal_rate'] ?? 'NIL' }}</td>
-                            <td class="col-9">{{ $row['overtime_rate'] ?? 'NIL' }}</td>
-                            <td class="col-10">{{ $row['overtime_earnings'] ?? 'NIL' }}</td>
-                            <td class="col-11">{{ $row['payment_date'] ?? 'NIL' }}</td>
-                            <td class="col-12">{{ $row['remarks'] ?? '' }}</td>
+                            <td class="col-2">{{ $row['name'] ?? '' }}</td>
+                            <td class="col-3">{{ $row['father_name'] ?? '' }}</td>
+                            <td class="col-4">{{ $row['sex'] ?? '' }}</td>
+                            <td class="col-5">{{ $row['designation'] ?? '' }}</td>
+                            <td class="col-6">{{ $row['overtime_dates'] ?? '' }}</td>
+                            <td class="col-7">{{ $row['total_overtime'] ?? '' }}</td>
+                            <td class="col-8">{{ $row['normal_rate'] ?? '' }}</td>
+                            <td class="col-9">{{ $row['overtime_rate'] ?? '' }}</td>
+                            <td class="col-10">{{ $row['overtime_earnings'] ?? '' }}</td>
+                            <td class="col-11">{{ $row['payment_date'] ?? '' }}</td>
+                            <td class="col-12"></td>
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="12" style="height: 18px;"></td>
-                    </tr>
-                    <tr class="no-overtime-row">
-                        <td colspan="12">NO BODY IN THE ORGANIZATION HAS WORKED OVER TIME FOR THE MONTH OF {{ strtoupper($header['month_year'] ?? '') }}</td>
+                        <td colspan="12" style="text-align:center;">No records found</td>
                     </tr>
                 @endif
             </tbody>
@@ -247,10 +224,11 @@
 
         <div class="footer-section">
             <div class="footer-left">*Applicable only in case of damage/loss/fine</div>
+
+            <div class="footer-right">Seal Signature of The Contractor</div>
         </div>
-        <div class="signature-section">
-            <div class="signature-label">Seal Signature of The Contractor</div>
-        </div>
+
+        <div class="signature-space"></div>
     </div>
 </body>
 </html>

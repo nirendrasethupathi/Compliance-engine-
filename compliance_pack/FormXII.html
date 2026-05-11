@@ -12,43 +12,42 @@
 
         body {
             font-family: 'Times New Roman', Times, serif;
-            padding: 6px;
+            padding: 15px;
         }
 
         .form-container {
             border: 2px solid black;
-            padding: 8px;
-            margin: 10px auto;
-            width: 92%;
+            padding: 12px;
+            margin: 0 auto;
+            width: 99%;
         }
 
         .form-header {
             text-align: center;
-            margin-bottom: 6px;
-            line-height: 1.2;
-            padding: 4px 0;
+            margin-bottom: 15px;
+            font-size: 12px;
         }
 
         .form-header div {
-            margin: 1px 0;
+            margin: 2px 0;
         }
 
         .header-title {
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .header-rule {
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .info-section {
-            margin-bottom: 8px;
-            font-size: 9px;
+            margin-bottom: 12px;
+            font-size: 10px;
         }
 
         .info-row {
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
         }
@@ -59,23 +58,24 @@
             margin-right: 5px;
         }
 
-
+        .dot-line {
+            flex: 1;
+            border-bottom: 1px dotted #000;
+            height: 10px;
+        }
 
         .register-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid black;
             font-size: 9px;
-            margin-top: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .register-table th,
         .register-table td {
             border: 1px solid black;
-            padding: 3px 4px;
-            font-size: 9px;
-            line-height: 1.2;
+            padding: 2px 2px;
             text-align: center;
             vertical-align: middle;
         }
@@ -84,10 +84,12 @@
             font-weight: bold;
             background-color: #fff;
             word-wrap: break-word;
+            line-height: 1.1;
+            height: 20px;
         }
 
         .register-table td {
-            height: 16px;
+            height: 18px;
             font-size: 8px;
         }
 
@@ -127,8 +129,7 @@
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
-            padding-bottom: 10px;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         .footer-left {
@@ -140,12 +141,16 @@
             text-align: right;
         }
 
-
+        .signature-line {
+            margin-top: 40px;
+            border-top: 1px solid #000;
+            width: 200px;
+            margin-left: auto;
+        }
 
         .signature-label {
-            margin-top: 6px;
+            margin-top: 14px;
             font-weight: bold;
-            font-size: 9px;
             text-align: right;
         }
     </style>
@@ -160,15 +165,19 @@
         </div>
 
         <div class="info-section">
-            <div style="margin-bottom: 4px; font-size: 9px;">
-                <div style="font-weight: bold; margin-bottom: 2px;">Name and address of the Principal Employer</div>
-                <div style="margin-left: 0;">M/S MAK47</div>
+            <div class="info-row">
+                <div class="info-label">Name and address of the Principal Employer</div>
+                <div class="dot-line"></div>
             </div>
+            <div style="margin-left: 40%; margin-bottom: 8px; font-size: 9px;">
+                M/S MAK47</div>
 
-            <div style="margin-bottom: 4px; font-size: 9px;">
-                <div style="font-weight: bold; margin-bottom: 2px;">Name and address of the Establishment</div>
-                <div style="margin-left: 0;">Survey No. 47, Sivagangai Industrial Estate, Sivagangai, Tamil Nadu – 630561</div>
+            <div class="info-row">
+                <div class="info-label">Name and address of the Establishment</div>
+                <div class="dot-line"></div>
             </div>
+            <div style="margin-left: 40%; margin-bottom: 8px; font-size: 9px;">
+                Survey No. 47, Sivagangai Industrial Estate, Sivagangai, Tamil Nadu – 630561</div>
         </div>
 
         <table class="register-table">
@@ -192,19 +201,20 @@
                 </tr>
             </thead>
             <tbody>
-                                    <tr class="no-records-row">
-                        <td colspan="7" style="height:32px; text-align:center; vertical-align:middle;">No records found</td>
+                                    <tr>
+                        <td colspan="7" style="text-align:center;">No records found</td>
                     </tr>
                             </tbody>
         </table>
 
         <div class="footer-section">
             <div class="footer-left">
-                <div>Place:</div>
-                <div>Date:</div>
+                <div>Place: __________</div>
+                <div>Date: __________</div>
             </div>
             <div class="footer-right">
-                <div class="signature-label" style="margin-top: 0;">Signature of the Licensing Officer</div>
+                <div class="signature-line"></div>
+                <div class="signature-label">Signature of the Licensing Officer</div>
             </div>
         </div>
     </div>
