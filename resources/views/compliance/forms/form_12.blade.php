@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FORM 12 - Register of Adult Workers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            padding: 12px;
+            font-size: 9px;
+        }
+        .form-container {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 0 auto;
+            width: 99%;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 10px;
+        }
+        .form-header div {
+            margin: 2px 0;
+        }
+        .header-title {
+            font-weight: bold;
+        }
+        .register-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid black;
+            font-size: 8px;
+            margin-bottom: 8px;
+        }
+        .register-table th,
+        .register-table td {
+            border: 1px solid black;
+            padding: 2px 2px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .register-table th {
+            font-weight: bold;
+            background-color: #fff;
+            line-height: 1.1;
+            height: 16px;
+            text-align: center;
+        }
+        .register-table td {
+            height: 20px;
+        }
+        .col-sl { width: 4%; text-align: center; }
+        .col-name { width: 28%; }
+        .col-father { width: 12%; }
+        .col-nature { width: 12%; }
+        .col-group { width: 6%; text-align: center; }
+        .col-relay { width: 6%; text-align: center; }
+        .col-cert { width: 10%; text-align: center; }
+        .col-token { width: 10%; text-align: center; }
+        .col-remarks { width: 12%; }
+        .footer-section {
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+        }
+        .footer-left {
+            flex: 1;
+        }
+        .footer-right {
+            flex: 1;
+            text-align: right;
+        }
+        .signature-line {
+            margin-top: 30px;
+            border-top: 1px solid #000;
+            width: 150px;
+            margin-left: auto;
+        }
+        .signature-label {
+            margin-top: 2px;
+            font-weight: bold;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <!-- Header -->
+        <div class="form-header">
+            <div>The Tamil Nadu Factories Rules</div>
+            <div class="header-title">FORM 12</div>
+            <div>(Prescribed under Rule 80)</div>
+            <div class="header-title">Register of adult workers</div>
+        </div>
+
+        <!-- Register Table -->
+        <table class="register-table">
+            <thead>
+                <tr>
+                    <th class="col-sl">(1)</th>
+                    <th class="col-name">(2)</th>
+                    <th class="col-father">(3)</th>
+                    <th class="col-nature">(4)</th>
+                    <th class="col-group">(5)</th>
+                    <th class="col-relay">(6)</th>
+                    <th class="col-cert">(7)</th>
+                    <th class="col-token">(8)</th>
+                    <th class="col-remarks">(9)</th>
+                </tr>
+                <tr>
+                    <th class="col-sl">Sl. No.</th>
+                    <th class="col-name">Name & residential address</th>
+                    <th class="col-father">Father's name</th>
+                    <th class="col-nature">Nature of work</th>
+                    <th class="col-group">Group</th>
+                    <th class="col-relay">Relay</th>
+                    <th class="col-cert">Certificate No.</th>
+                    <th class="col-token">Token No.</th>
+                    <th class="col-remarks">Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(!empty($rows) && count($rows) > 0)
+                    @foreach($rows as $index => $row)
+                        <tr>
+                            <td class="col-sl">{{ $index + 1 }}</td>
+                            <td class="col-name">{{ $row['employee_name'] ?? '' }}</td>
+                            <td class="col-father">{{ $row['father_name'] ?? '' }}</td>
+                            <td class="col-nature">{{ $row['designation'] ?? '' }}</td>
+                            <td class="col-group">{{ $row['group'] ?? '' }}</td>
+                            <td class="col-relay">{{ $row['relay'] ?? '' }}</td>
+                            <td class="col-cert">{{ $row['certificate_no'] ?? '' }}</td>
+                            <td class="col-token">{{ $row['token_no'] ?? '' }}</td>
+                            <td class="col-remarks">{{ $row['remarks'] ?? '' }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="9" style="text-align:center;">No records found</td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+
+        <!-- Footer -->
+        <div class="footer-section">
+            <div class="footer-left">
+                <div>Date: ___________</div>
+            </div>
+            <div class="footer-right">
+                <div class="signature-line"></div>
+                <div class="signature-label">(Signed) Manager/Occupier</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
