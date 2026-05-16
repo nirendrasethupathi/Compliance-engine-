@@ -18,21 +18,22 @@ class Form10ApiService extends BaseFormApiService
             ->where('e.branch_id', $branchId)
             ->whereYear('pc.period_from', $year)
             ->whereMonth('pc.period_from', $month)
-            ->select([
-                'e.employee_code',
-                'e.name',
-                'e.designation',
-                'pe.overtime_hours',
-                'pe.overtime_wages',
-                'pe.basic_earned',
-                'pe.da_earned',
-                'pe.hra_earned',
-                'pe.other_allowances',
-                'pe.total_days_worked',
-            ])
+            ->selectRaw("
+                e.employee_code,
+                e.name,
+                e.designation,
+                e.department,
+                pe.overtime_hours               AS overtime_hours,
+                pe.overtime_wages               AS overtime_wages,
+                COALESCE(NULLIF(pe.basic_earned,0), e.basic_salary, 0) AS basic_earned,
+                COALESCE(pe.da_earned, 0)       AS da_earned,
+                COALESCE(pe.hra_earned, 0)      AS hra_earned,
+                COALESCE(pe.other_allowances,0) AS other_allowances,
+                pe.total_days_worked            AS total_days_worked
+            ")
             ->orderBy('e.employee_code')
             ->get()
-            ->map(fn($row) => (array)$row)
+            ->map(fn($row) => (array) $row)
             ->toArray();
 
         $totalWorkers = DB::table('workforce_employee')
@@ -46,18 +47,18 @@ class Form10ApiService extends BaseFormApiService
             ->value('contractor_name');
 
         return [
-            'records' => $rows,
-            'meta' => [
-                'tenant_id'    => $tenantId,
-                'branch_id'    => $branchId,
-                'month'        => $month,
-                'year'         => $year,
+            'records'         => $rows,
+            'meta'            => [
+                'tenant_id'     => $tenantId,
+                'branch_id'     => $branchId,
+                'month'         => $month,
+                'year'          => $year,
                 'total_workers' => $totalWorkers,
             ],
-            'tenant'            => $this->getTenantDetails($tenantId),
-            'branch'            => $this->getBranchDetails($branchId, $tenantId),
-            'period'            => $this->formatPeriod(),
-            'contractor_name'   => $contractor ?? '',
+            'tenant'          => $this->getTenantDetails($tenantId),
+            'branch'          => $this->getBranchDetails($branchId, $tenantId),
+            'period'          => $this->formatPeriod(),
+            'contractor_name' => $contractor ?? '',
         ];
     }
 }

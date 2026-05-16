@@ -34,12 +34,14 @@ class FormXXIIApiService extends BaseFormApiService
             ->whereMonth('period_from', $month)
             ->value('id');
 
+        $employeeIds = $employees->pluck('id');
+
         // Step 3: payroll entries keyed by employee_id (only if cycle exists)
         $payrollMap = [];
         if ($cycleId && $employees->isNotEmpty()) {
             DB::table('workforce_payroll_entry')
                 ->where('payroll_cycle_id', $cycleId)
-                ->whereIn('employee_id', $employees->pluck('id'))
+                ->whereIn('employee_id', $employeeIds)
                 ->select(['employee_id', 'advances', 'payment_date'])
                 ->get()
                 ->each(function ($entry) use (&$payrollMap) {
@@ -47,20 +49,61 @@ class FormXXIIApiService extends BaseFormApiService
                 });
         }
 
-        // Step 4: merge into records array
+        // Step 4: dedicated workforce_advances table — more granular than payroll lump
+        $tableAdvances = collect();
+        if (\Illuminate\Support\Facades\Schema::hasTable('workforce_advances')) {
+            $tableAdvances = DB::table('workforce_advances')
+                ->where('tenant_id', $tenantId)
+                ->where('branch_id', $branchId)
+                ->whereBetween('advance_date', [$this->periodStart, $this->periodEnd])
+                ->whereNull('deleted_at')
+                ->whereIn('employee_id', $employeeIds)
+                ->select([
+                    'employee_id',
+                    'amount as advance_amount',
+                    'advance_date',
+                    'purpose',
+                    'installments',
+                    'installment_repaid',
+                    'remarks',
+                ])
+                ->get()
+                ->groupBy('employee_id');
+        }
+
+        // Step 5: merge into records array — workforce_advances takes priority
         $records = [];
         foreach ($employees as $emp) {
-            $emp     = (array) $emp;
-            $payroll = $payrollMap[$emp['id']] ?? [];
+            $emp   = (array) $emp;
+            $empId = $emp['id'];
 
-            $records[] = array_merge($emp, [
-                'advance_amount'        => (float) ($payroll['advances']    ?? 0),
-                'advance_date'          => $payroll['payment_date']         ?? null,
-                'purpose'               => 'Salary Advance',
-                'installments'          => 1,
-                'installment_repaid'    => null,
-                'last_installment_date' => null,
-            ]);
+            if ($tableAdvances->has($empId)) {
+                // One record per advance entry
+                foreach ($tableAdvances->get($empId) as $adv) {
+                    $adv = (array) $adv;
+                    $records[] = array_merge($emp, [
+                        'advance_amount'        => (float) ($adv['advance_amount']    ?? 0),
+                        'advance_date'          => $adv['advance_date']               ?? null,
+                        'purpose'               => $adv['purpose']                   ?? 'Salary Advance',
+                        'installments'          => $adv['installments']               ?? 1,
+                        'installment_repaid'    => $adv['installment_repaid']         ?? null,
+                        'last_installment_date' => null,
+                        'remarks'               => $adv['remarks']                   ?? null,
+                    ]);
+                }
+            } else {
+                // Fall back to payroll_entry.advances lump
+                $payroll = $payrollMap[$empId] ?? [];
+                $records[] = array_merge($emp, [
+                    'advance_amount'        => (float) ($payroll['advances']    ?? 0),
+                    'advance_date'          => $payroll['payment_date']         ?? null,
+                    'purpose'               => 'Salary Advance',
+                    'installments'          => 1,
+                    'installment_repaid'    => null,
+                    'last_installment_date' => null,
+                    'remarks'               => null,
+                ]);
+            }
         }
 
         return [

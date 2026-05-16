@@ -100,7 +100,10 @@ class ComplianceDataUploadController extends Controller
                     $request->input('period_to')
                 );
                 $payrollCount = $this->insertPayroll($payrollRows, $empCodeToId, $tenantId, $branchId, $cycleId);
-                $attendCount  = $this->insertAttendance($attendRows, $empCodeToId, $tenantId, $branchId);
+                $attendCount  = $this->insertAttendance(
+                    $attendRows, $empCodeToId, $tenantId, $branchId,
+                    $request->input('period_from')
+                );
 
                 return [
                     'employees'  => count($empCodeToId),
@@ -132,20 +135,65 @@ class ComplianceDataUploadController extends Controller
         }
     }
 
+    // ── Employee Payload Builder ──────────────────────────────────────────────
+
+    private function buildEmployeePayload(array $row, int $tenantId, int $branchId, bool $withTimestamps = true): array
+    {
+        $payload = [
+            'tenant_id'         => $tenantId,
+            'branch_id'         => $branchId,
+            'employee_code'     => $row['employee_code'],
+            'name'              => $row['name'],
+            'father_name'       => $row['father_name']       ?? null,
+            'gender'            => $row['gender']            ?? null,
+            'date_of_birth'     => $this->parseDate($row['date_of_birth'] ?? null),
+            'marital_status'    => $row['marital_status']    ?? null,
+            'nationality'       => $row['nationality']       ?? null,
+            'mobile'            => $row['mobile']            ?? null,
+            'email'             => $row['email']             ?? null,
+            'permanent_address' => $row['permanent_address'] ?? null,
+            'designation'       => $row['designation']       ?? null,
+            'department'        => $row['department']        ?? null,
+            'skill_type'        => $row['skill_type']        ?? null,
+            'date_of_joining'   => $this->parseDate($row['date_of_joining'] ?? null) ?? now()->toDateString(),
+            'pf_number'         => $row['pf_number']         ?? null,
+            'esi_number'        => $row['esi_number']        ?? null,
+            'uan_number'        => $row['uan_number']        ?? $row['pf_number'] ?? null,
+            'pan'               => $row['pan']               ?? null,
+            'aadhaar'           => $row['aadhaar']           ?? null,
+            'bank_account'      => $row['bank_account']      ?? null,
+            'bank_name'         => $row['bank_name']         ?? null,
+            'ifsc'              => $row['ifsc']              ?? null,
+            'basic_salary'      => (float) ($row['basic_salary'] ?? 0),
+            'status'            => 'active',
+            'updated_at'        => now(),
+        ];
+
+        if ($withTimestamps) {
+            $payload['created_at'] = now();
+        }
+
+        return $payload;
+    }
+
+    private function parseDate(?string $value): ?string
+    {
+        if (empty($value)) return null;
+        try {
+            return \Carbon\Carbon::parse($value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     // ── CSV Parsing ───────────────────────────────────────────────────────────
 
     /**
-     * Parse a CSV file into an array of associative rows (lowercase keys).
-     * Throws on empty file or missing required headers.
+     * Parse a CSV file using CsvColumnMapper for intelligent alias resolution.
+     * Returns rows keyed by CANONICAL field names (e.g. 'gross_salary', 'uan_number').
      */
     private function parseCsv(\Illuminate\Http\UploadedFile $file, string $type): array
     {
-        $required = [
-            'employees'  => ['employee_code', 'name'],
-            'payroll'    => ['employee_code', 'gross_salary', 'net_salary'],
-            'attendance' => ['employee_code', 'working_days'],
-        ];
-
         $path   = $file->getRealPath();
         $handle = fopen($path, 'r');
 
@@ -160,13 +208,10 @@ class ComplianceDataUploadController extends Controller
             throw new \InvalidArgumentException("CSV ({$type}): file is empty.");
         }
 
-        // Strip UTF-8 BOM (EF BB BF) that Excel adds — causes invisible garbage
-        // in the first header name, breaking array_diff required-column checks.
+        // Strip UTF-8 BOM that Excel adds — causes invisible garbage in first header
         $firstLine = preg_replace('/^\xEF\xBB\xBF/', '', $firstLine);
-
         $delimiter = substr_count($firstLine, ';') > substr_count($firstLine, ',') ? ';' : ',';
 
-        // Rewind and re-read with correct delimiter
         rewind($handle);
 
         // ── Header row ───────────────────────────────────────────────────────
@@ -176,46 +221,46 @@ class ComplianceDataUploadController extends Controller
             throw new \InvalidArgumentException("CSV ({$type}): could not read header row.");
         }
 
-        // Normalise: strip BOM from first cell, lowercase, spaces→underscore
-        $headers = array_map(function (string $h): string {
-            $h = preg_replace('/^\xEF\xBB\xBF/', '', $h); // BOM on first cell
-            return strtolower(trim(preg_replace('/\s+/', '_', $h)));
-        }, $rawHeaders);
+        // Strip BOM from first cell only
+        $rawHeaders[0] = preg_replace('/^\xEF\xBB\xBF/', '', $rawHeaders[0]);
 
-        // ── Required-column check ─────────────────────────────────────────────
-        $missing = array_diff($required[$type], $headers);
+        // ── Alias-aware mapping: raw header → canonical field name ─────────────
+        $skipped       = [];
+        $headerMapping = \App\Services\Compliance\CsvColumnMapper::mapHeaders($rawHeaders, $type, $skipped);
+        $required      = \App\Services\Compliance\CsvColumnMapper::requiredFields($type);
+        $missing       = array_diff($required, array_keys($headerMapping));
+
         if (! empty($missing)) {
             fclose($handle);
             throw new \InvalidArgumentException(
                 "CSV ({$type}): missing required columns: " . implode(', ', $missing) .
-                ". Found: " . implode(', ', $headers)
+                ". Found: " . implode(', ', $rawHeaders)
             );
         }
 
-        // ── Data rows ─────────────────────────────────────────────────────────
-        $rows    = [];
-        $lineNum = 1;
+        if (! empty($skipped)) {
+            Log::debug("CSV ({$type}): unrecognised columns skipped", ['skipped' => $skipped]);
+        }
+
+        // ── Data rows — returned with CANONICAL keys ───────────────────────────
+        $rows     = [];
+        $colCount = count($rawHeaders);
 
         while (($data = fgetcsv($handle, 4096, $delimiter)) !== false) {
-            $lineNum++;
-
-            // Skip completely empty lines
             if ($data === [null] || implode('', $data) === '') {
                 continue;
             }
 
-            // Pad or trim to match header count (handles trailing commas)
-            $colCount = count($headers);
             if (count($data) < $colCount) {
                 $data = array_pad($data, $colCount, '');
             } elseif (count($data) > $colCount) {
                 $data = array_slice($data, 0, $colCount);
             }
 
-            $row = array_combine($headers, array_map('trim', $data));
+            $row = \App\Services\Compliance\CsvColumnMapper::extractRow($data, $headerMapping);
 
             if (empty($row['employee_code'])) {
-                continue; // skip blank-code rows (e.g. footer lines)
+                continue; // skip blank-code rows (e.g. footer totals)
             }
 
             $rows[] = $row;
@@ -227,7 +272,11 @@ class ComplianceDataUploadController extends Controller
             throw new \InvalidArgumentException("CSV ({$type}): no valid data rows found.");
         }
 
-        Log::debug("CSV ({$type}) parsed", ['rows' => count($rows), 'delimiter' => $delimiter, 'headers' => $headers]);
+        Log::debug("CSV ({$type}) parsed", [
+            'rows'      => count($rows),
+            'delimiter' => $delimiter,
+            'mapped'    => array_keys($headerMapping),
+        ]);
 
         return $rows;
     }
@@ -284,28 +333,19 @@ class ComplianceDataUploadController extends Controller
                 ->value('id');
 
             if ($existing) {
+                DB::table('workforce_employee')
+                    ->where('id', $existing)
+                    ->update(array_diff_key(
+                        $this->buildEmployeePayload($row, $tenantId, $branchId, false),
+                        ['tenant_id' => 1, 'branch_id' => 1, 'employee_code' => 1, 'created_at' => 1]
+                    ));
                 $map[$code] = $existing;
                 continue;
             }
 
-            $id = DB::table('workforce_employee')->insertGetId([
-                'tenant_id'          => $tenantId,
-                'branch_id'          => $branchId,
-                'employee_code'      => $code,
-                'name'               => $row['name'],
-                'designation'        => $row['designation']      ?? null,
-                'department'         => $row['department']       ?? null,
-                'pf_number'          => $row['uan']              ?? $row['pf_number']    ?? null,
-                'esi_number'         => $row['esi']              ?? $row['esi_number']   ?? null,
-                'basic_salary'       => isset($row['basic_salary']) ? (float) $row['basic_salary'] : 0,
-                'date_of_joining'    => $row['date_of_joining']  ?? $row['doj']          ?? now()->toDateString(),
-                'date_of_birth'      => $row['date_of_birth']    ?? $row['dob']          ?? null,
-                'gender'             => $row['gender']           ?? $row['sex']          ?? null,
-                'permanent_address'  => $row['permanent_address'] ?? $row['address']     ?? null,
-                'status'             => 'active',
-                'created_at'         => now(),
-                'updated_at'         => now(),
-            ]);
+            $id = DB::table('workforce_employee')->insertGetId(
+                $this->buildEmployeePayload($row, $tenantId, $branchId)
+            );
 
             $map[$code] = $id;
         }
@@ -352,16 +392,17 @@ class ComplianceDataUploadController extends Controller
                 throw new \RuntimeException("Payroll data mismatch for employee {$code}");
             }
 
-            $gross       = (float) ($row['gross_salary']     ?? $row['gross']          ?? 0);
-            $net         = (float) ($row['net_salary']        ?? $row['net']            ?? 0);
-            $basic       = (float) ($row['basic_salary']      ?? $row['basic']          ?? 0);
-            $pf          = (float) ($row['pf_employee']       ?? $row['pf']             ?? 0);
-            $esi         = (float) ($row['esi_employee']      ?? $row['esi']            ?? 0);
-            $pt          = (float) ($row['professional_tax']  ?? $row['pt']             ?? 0);
-            $otHours     = (float) ($row['overtime_hours']    ?? $row['ot_hours']       ?? 0);
-            $otWages     = (float) ($row['overtime_wages']    ?? $row['ot_wages']       ?? 0);
-            $workingDays = (int)   ($row['working_days']      ?? $row['days_worked']    ?? 26);
-            $absent      = (int)   ($row['absent']            ?? $row['absent_days']    ?? 0);
+            // All keys are canonical names thanks to CsvColumnMapper in parseCsv()
+            $gross       = (float) ($row['gross_salary']     ?? 0);
+            $net         = (float) ($row['net_salary']       ?? 0);
+            $basic       = (float) ($row['basic_earned']     ?? $row['basic_salary'] ?? 0);
+            $pf          = (float) ($row['pf_employee']      ?? 0);
+            $esi         = (float) ($row['esi_employee']     ?? 0);
+            $pt          = (float) ($row['professional_tax'] ?? 0);
+            $otHours     = (float) ($row['overtime_hours']   ?? 0);
+            $otWages     = (float) ($row['overtime_wages']   ?? 0);
+            $workingDays = (int)   ($row['total_days_worked'] ?? 26);
+            $absent      = (int)   ($row['unpaid_leave_days'] ?? 0);
             $totalDeduct = $gross - $net;
 
             // Numeric sanity
@@ -378,21 +419,21 @@ class ComplianceDataUploadController extends Controller
                 'payroll_cycle_id'  => $cycleId,
                 'employee_id'       => $empMap[$code],
                 'total_days_worked' => $workingDays,
-                'paid_leave_days'   => 0,
+                'paid_leave_days'   => (int) ($row['paid_leave_days'] ?? 0),
                 'unpaid_leave_days' => $absent,
                 'overtime_hours'    => $otHours,
                 'basic_earned'      => $basic,
-                'da_earned'         => (float) ($row['da']               ?? 0),
-                'hra_earned'        => (float) ($row['hra']              ?? 0),
-                'other_allowances'  => (float) ($row['other_allowances'] ?? 0),
+                'da_earned'         => (float) ($row['da_earned']           ?? 0),
+                'hra_earned'        => (float) ($row['hra_earned']          ?? 0),
+                'other_allowances'  => (float) ($row['other_allowances']    ?? 0),
                 'overtime_wages'    => $otWages,
                 'gross_salary'      => $gross,
                 'pf_employee'       => $pf,
                 'esi_employee'      => $esi,
                 'professional_tax'  => $pt,
-                'fines'             => 0,
-                'advances'          => 0,
-                'other_deductions'  => 0,
+                'fines'             => (float) ($row['fines']              ?? 0),
+                'advances'          => (float) ($row['advances']           ?? 0),
+                'other_deductions'  => (float) ($row['other_deductions']   ?? 0),
                 'total_deductions'  => $totalDeduct,
                 'net_salary'        => $net,
                 'payment_date'      => $row['payment_date'] ?? null,
@@ -409,8 +450,15 @@ class ComplianceDataUploadController extends Controller
 
     // ── Insert Attendance ─────────────────────────────────────────────────────
 
-    private function insertAttendance(array $rows, array $empMap, int $tenantId, int $branchId): int
-    {
+    private function insertAttendance(
+        array $rows, array $empMap, int $tenantId, int $branchId, ?string $periodFrom = null
+    ): int {
+        // Use the upload's period_from so attendance is stored in the correct month,
+        // not always the current calendar month.
+        $periodStart = $periodFrom
+            ? \Carbon\Carbon::parse($periodFrom)->startOfMonth()
+            : now()->startOfMonth();
+
         $count = 0;
 
         foreach ($rows as $row) {
@@ -420,42 +468,62 @@ class ComplianceDataUploadController extends Controller
                 throw new \RuntimeException("Attendance data mismatch for employee {$code}");
             }
 
-            $workingDays = (int) ($row['working_days'] ?? $row['total_days'] ?? 26);
-            $absent      = (int) ($row['absent'] ?? 0);
-            $presentDays = $workingDays - $absent;
+            $workingDays = (int) ($row['working_days'] ?? 26);
+            $absentDays  = (int) ($row['absent_days']  ?? 0);
+            $otHours     = (float) ($row['overtime_hours'] ?? 0);
 
-            // Generate one attendance row per present day using the period
-            // stored on the payroll cycle; fall back to current month if absent.
-            $date = $row['attendance_date'] ?? $row['date'] ?? null;
-
-            if ($date) {
-                // Single-row mode: one row with a specific date
-                DB::table('workforce_attendance')->insertOrIgnore([
-                    'tenant_id'       => $tenantId,
-                    'branch_id'       => $branchId,
-                    'employee_id'     => $empMap[$code],
-                    'attendance_date' => $date,
-                    'status'          => $row['status'] ?? 'present',
-                    'created_at'      => now(),
-                    'updated_at'      => now(),
-                ]);
+            // Single-row mode: CSV has an explicit date
+            $explicitDate = trim($row['attendance_date'] ?? '');
+            if ($explicitDate !== '' && strtotime($explicitDate)) {
+                DB::table('workforce_attendance')->updateOrInsert(
+                    [
+                        'tenant_id'       => $tenantId,
+                        'employee_id'     => $empMap[$code],
+                        'attendance_date' => $explicitDate,
+                    ],
+                    [
+                        'branch_id'      => $branchId,
+                        'status'         => ($row['attendance_status'] ?? 'present'),
+                        'overtime_hours' => $otHours,
+                        'deleted_at'     => null,
+                        'updated_at'     => now(),
+                        'created_at'     => now(),
+                    ]
+                );
                 $count++;
-            } else {
-                // Summary mode: CSV has working_days + absent counts.
-                // Insert a summary record using today as a placeholder date.
-                // Real per-day records should come from a date-based CSV.
-                DB::table('workforce_attendance')->insertOrIgnore([
-                    'tenant_id'       => $tenantId,
-                    'branch_id'       => $branchId,
-                    'employee_id'     => $empMap[$code],
-                    'attendance_date' => now()->toDateString(),
-                    'status'          => $presentDays > 0 ? 'present' : 'absent',
-                    'remarks'         => "CSV import: {$presentDays}/{$workingDays} days present",
-                    'created_at'      => now(),
-                    'updated_at'      => now(),
-                ]);
-                $count++;
+                continue;
             }
+
+            // Summary mode: expand into per-day rows for the correct pay-period month
+            $daysInMonth  = $periodStart->daysInMonth;
+            $absentFilled = 0;
+
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $date      = $periodStart->copy()->day($day)->toDateString();
+                $dayOfWeek = $periodStart->copy()->day($day)->dayOfWeek;
+                if ($dayOfWeek === 0) continue; // skip Sundays
+
+                $remainingDays = $daysInMonth - $day + 1;
+                $isAbsent = ($absentFilled < $absentDays) && ($remainingDays <= ($absentDays - $absentFilled));
+                if ($isAbsent) $absentFilled++;
+
+                DB::table('workforce_attendance')->updateOrInsert(
+                    [
+                        'tenant_id'       => $tenantId,
+                        'employee_id'     => $empMap[$code],
+                        'attendance_date' => $date,
+                    ],
+                    [
+                        'branch_id'      => $branchId,
+                        'status'         => $isAbsent ? 'absent' : 'present',
+                        'overtime_hours' => ($day === 1) ? $otHours : 0,
+                        'deleted_at'     => null,
+                        'updated_at'     => now(),
+                        'created_at'     => now(),
+                    ]
+                );
+            }
+            $count++;
         }
 
         return $count;

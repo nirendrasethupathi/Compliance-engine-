@@ -11,47 +11,68 @@ class Form25ApiService extends BaseFormApiService
         $this->initializePeriod($month, $year);
         $this->validateTenantAndBranch($tenantId, $branchId);
 
-        $rows = DB::table('workforce_employee as we')
+        $periodStart = $this->periodStart;
+        $periodEnd   = $this->periodEnd;
+
+        $employees = DB::table('workforce_employee as we')
             ->where('we.tenant_id', $tenantId)
             ->where('we.branch_id', $branchId)
-            ->whereExists(function($query) use ($year, $month) {
-                $query->select(DB::raw(1))
-                    ->from('workforce_attendance as wa')
-                    ->whereColumn('wa.employee_id', 'we.id')
-                    ->whereYear('wa.attendance_date', $year)
-                    ->whereMonth('wa.attendance_date', $month);
-            })
+            ->where('we.status', 'active')
+            ->whereNull('we.deleted_at')
             ->select([
                 'we.id',
+                'we.employee_code',
                 'we.name',
                 'we.father_name',
                 'we.designation',
+                'we.gender',
                 'we.date_of_birth',
+                'we.date_of_joining',
             ])
             ->orderBy('we.name')
-            ->get()
-            ->toArray();
+            ->get();
 
-        // Add attendance date from first attendance record for each employee
-        foreach ($rows as &$row) {
-            $attendance = DB::table('workforce_attendance')
-                ->where('employee_id', $row->id)
-                ->whereYear('attendance_date', $year)
-                ->whereMonth('attendance_date', $month)
-                ->select('attendance_date')
-                ->orderBy('attendance_date')
-                ->first();
-            $row->attendance_date = $attendance?->attendance_date ?? '';
-            unset($row->id);
+        // Attendance summary per employee for the period
+        $attendanceSummary = DB::table('workforce_attendance')
+            ->where('tenant_id', $tenantId)
+            ->whereBetween('attendance_date', [$periodStart, $periodEnd])
+            ->whereIn('employee_id', $employees->pluck('id'))
+            ->select('employee_id', 'attendance_date', 'status')
+            ->get()
+            ->groupBy('employee_id');
+
+        $records = [];
+        foreach ($employees as $emp) {
+            $emp        = (array) $emp;
+            $attendance = $attendanceSummary[$emp['id']] ?? collect();
+
+            $presentDays = $attendance->whereIn('status', ['present', 'leave'])->count();
+            $absentDays  = $attendance->where('status', 'absent')->count();
+            $firstDate   = $attendance->sortBy('attendance_date')->first()?->attendance_date ?? '';
+
+            $records[] = [
+                'employee_code'       => $emp['employee_code'],
+                'name'                => $emp['name'],
+                'father_name'         => $emp['father_name']    ?? '',
+                'designation'         => $emp['designation']    ?? '',
+                'gender'              => $emp['gender']         ?? '',
+                'date_of_birth'       => $emp['date_of_birth']  ?? '',
+                'date_of_joining'     => $emp['date_of_joining'] ?? '',
+                'place_of_employment' => $this->getBranchDetails($branchId, $tenantId)['address'] ?? '',
+                'attendance_date'     => $firstDate,
+                'present_days'        => $presentDays,
+                'absent_days'         => $absentDays,
+                'total_days'          => $presentDays + $absentDays,
+            ];
         }
 
         return [
-            'records' => array_map(fn($row) => (array)$row, $rows),
-            'meta' => [
+            'records' => $records,
+            'meta'    => [
                 'tenant_id' => $tenantId,
                 'branch_id' => $branchId,
-                'month' => $month,
-                'year' => $year,
+                'month'     => $month,
+                'year'      => $year,
             ],
             'tenant' => $this->getTenantDetails($tenantId),
             'branch' => $this->getBranchDetails($branchId, $tenantId),

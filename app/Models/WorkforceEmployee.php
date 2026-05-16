@@ -14,22 +14,20 @@ class WorkforceEmployee extends Model
     protected $table = 'workforce_employee';
 
     protected $fillable = [
-        'tenant_id',
-        'branch_id',
-        'employee_code',
-        'name',
-        'pf_number',
-        'esi_number',
-        'date_of_joining',
-        'designation',
-        'department',
-        'basic_salary',
-        'status',
+        'tenant_id', 'branch_id', 'employee_code', 'name',
+        'father_name', 'gender', 'date_of_birth', 'marital_status',
+        'nationality', 'mobile', 'email', 'permanent_address', 'local_address',
+        'designation', 'department', 'skill_type', 'date_of_joining', 'date_of_exit',
+        'pf_number', 'esi_number', 'uan_number', 'pan', 'aadhaar',
+        'bank_account', 'bank_name', 'ifsc',
+        'basic_salary', 'status',
     ];
 
     protected $casts = [
         'date_of_joining' => 'date',
-        'basic_salary' => 'decimal:2',
+        'date_of_birth'   => 'date',
+        'date_of_exit'    => 'date',
+        'basic_salary'    => 'decimal:2',
     ];
 
     protected static function booted(): void

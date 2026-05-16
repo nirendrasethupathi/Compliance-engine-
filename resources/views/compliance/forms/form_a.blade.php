@@ -160,7 +160,7 @@
             <tr>
                 <td class="tc">{{ $i + 1 }}</td>
                 <td class="tc">{{ $row['employee_code'] ?? '' }}</td>
-                <td class="tl" style="white-space:nowrap;">{{ $row['employee_name'] ?? $row['name'] ?? '' }}</td>
+                <td class="tl" style="white-space:nowrap;">{{ $row['employee_name'] ?? '' }}</td>
                 <td class="tl">{{ $row['surname'] ?? '' }}</td>
                 <td class="tc">{{ $row['gender'] ?? '' }}</td>
                 <td class="tl">{{ $row['father_name'] ?? '' }}</td>
@@ -170,19 +170,19 @@
                 <td class="tc" style="white-space:nowrap;">{{ $row['date_of_joining'] ?? '' }}</td>
                 <td class="tl">{{ $row['designation'] ?? '' }}</td>
                 <td class="tc">{{ $row['category'] ?? '' }}</td>
-                <td class="tc" style="white-space:nowrap; word-break:keep-all;">{{ $row['employment_type'] ?? 'Temporary' }}</td>
+                <td class="tc" style="white-space:nowrap; word-break:keep-all;">{{ $row['employment_type'] ?? '' }}</td>
                 <td class="tc">{{ $row['mobile'] ?? '' }}</td>
-                <td class="tc">{{ $row['uan'] ?? $row['uan_number'] ?? '' }}</td>
+                <td class="tc">{{ $row['uan_number'] ?? '' }}</td>
                 <td class="tc" style="white-space:nowrap;">{{ $row['esi_number'] ?? '' }}</td>
                 <td class="tc" style="white-space:nowrap;">{{ $row['pf_number'] ?? '' }}</td>
                 <td class="tc">{{ $row['lwf'] ?? '-' }}</td>
-                <td class="tc">{{ $row['aadhaar'] ?? $row['aadhaar_number'] ?? '' }}</td>
-                <td class="tc">{{ $row['bank_account'] ?? $row['bank_account_number'] ?? '' }}</td>
-                <td class="tl">{{ $row['ifsc_code'] ?? '' }}</td>
-                <td class="tl">{{ $row['present_address'] ?? $row['local_address'] ?? '' }}</td>
+                <td class="tc">{{ $row['aadhaar'] ?? '' }}</td>
+                <td class="tc">{{ $row['bank_account'] ?? '' }}</td>
+                <td class="tl">{{ $row['branch_ifsc'] ?? (($row['bank_name'] ?? '') . ($row['ifsc'] ? ' (' . $row['ifsc'] . ')' : '')) }}</td>
+                <td class="tl">{{ $row['present_address'] ?? '' }}</td>
                 <td class="tl">{{ $row['permanent_address'] ?? '' }}</td>
-                <td class="tc">{{ $row['date_of_exit'] ?? '-' }}</td>
-                <td class="tc">{{ $row['reason_for_exit'] ?? '-' }}</td>
+                <td class="tc">{{ $row['date_of_exit'] ?? '' }}</td>
+                <td class="tc">{{ $row['reason_for_exit'] ?? '' }}</td>
                 <td class="tl">{{ $row['identification_mark'] ?? '' }}</td>
                 <td class="tc"></td>
                 <td class="tc"></td>

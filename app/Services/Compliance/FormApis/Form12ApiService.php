@@ -14,27 +14,41 @@ class Form12ApiService extends BaseFormApiService
         $rows = DB::table('workforce_employee')
             ->where('tenant_id', $tenantId)
             ->where('branch_id', $branchId)
+            ->where('status', 'active')
+            ->whereNull('deleted_at')
             ->select([
                 'employee_code',
                 'name',
-                'permanent_address as address',
                 'father_name',
-                'designation',
-                'date_of_joining',
-                'date_of_birth',
                 'gender',
+                'date_of_birth',
+                'permanent_address as address',
+                'designation',
+                'department',
+                'date_of_joining',
+                'date_of_exit',
+                'pf_number',
+                'esi_number',
+                DB::raw('COALESCE(uan_number, pf_number) as uan'),
+                'mobile',
+                'bank_account',
+                'bank_name',
+                'ifsc',
+                'skill_type',
+                'nationality',
             ])
             ->orderBy('employee_code')
             ->get()
+            ->map(fn($row) => (array) $row)
             ->toArray();
 
         return [
             'records' => $rows,
-            'meta' => [
+            'meta'    => [
                 'tenant_id' => $tenantId,
                 'branch_id' => $branchId,
-                'month' => $month,
-                'year' => $year,
+                'month'     => $month,
+                'year'      => $year,
             ],
             'tenant' => $this->getTenantDetails($tenantId),
             'branch' => $this->getBranchDetails($branchId, $tenantId),

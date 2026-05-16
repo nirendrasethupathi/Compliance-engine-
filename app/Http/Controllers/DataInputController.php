@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ComplianceExecutionBatch;
 use App\Models\ComplianceBatchForm;
+use App\Services\Compliance\CsvNormalizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -135,6 +136,11 @@ class DataInputController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function parseDate(?string $value): ?string
+    {
+        return CsvNormalizer::normalizeDate($value);
     }
 
     /**
@@ -380,36 +386,46 @@ class DataInputController extends Controller
                             ->where('employee_code', $row['employee_code'])
                             ->exists();
 
+                        $employeeFields = [
+                                    'name'              => $row['name'],
+                                    'father_name'       => $row['father_name']       ?? null,
+                                    'gender'            => CsvNormalizer::normalizeGender($row['gender'] ?? null),
+                                    'date_of_birth'     => $this->parseDate($row['date_of_birth'] ?? null),
+                                    'marital_status'    => $row['marital_status']    ?? null,
+                                    'nationality'       => $row['nationality']       ?? null,
+                                    'mobile'            => CsvNormalizer::normalizeMobile($row['mobile'] ?? null),
+                                    'email'             => $row['email']             ?? null,
+                                    'permanent_address' => $row['permanent_address'] ?? null,
+                                    'designation'       => $row['designation']       ?? null,
+                                    'department'        => $row['department']        ?? null,
+                                    'skill_type'        => $row['skill_type']        ?? null,
+                                    'date_of_joining'   => $this->parseDate($row['date_of_joining'] ?? null),
+                                    'pf_number'         => CsvNormalizer::normalizePF($row['pf_number'] ?? null),
+                                    'esi_number'        => CsvNormalizer::normalizeESI($row['esi_number'] ?? null),
+                                    'uan_number'        => CsvNormalizer::normalizeUAN($row['uan_number'] ?? $row['pf_number'] ?? null),
+                                    'pan'               => $row['pan']               ?? null,
+                                    'aadhaar'           => $row['aadhaar']           ?? null,
+                                    'bank_account'      => $row['bank_account']      ?? null,
+                                    'bank_name'         => $row['bank_name']         ?? null,
+                                    'ifsc'              => $row['ifsc']              ?? null,
+                                    'basic_salary'      => CsvNormalizer::normalizeFloat($row['basic_salary'] ?? null),
+                                ];
+
                         if ($exists) {
-                            // Update existing record so re-uploads refresh data
                             DB::table('workforce_employee')
                                 ->where('tenant_id', $batch->tenant_id)
                                 ->where('employee_code', $row['employee_code'])
-                                ->update([
-                                    'name'            => $row['name'],
-                                    'designation'     => $row['designation'] ?? null,
-                                    'department'      => $row['department']  ?? null,
-                                    'pf_number'       => $row['uan']         ?? $row['pf_number']  ?? null,
-                                    'esi_number'      => $row['esi']         ?? $row['esi_number'] ?? null,
-                                    'basic_salary'    => (float) ($row['basic_salary'] ?? $row['salary'] ?? 0),
-                                    'updated_at'      => now(),
-                                ]);
+                                ->update(array_merge($employeeFields, ['updated_at' => now()]));
                         } else {
-                            DB::table('workforce_employee')->insert([
-                                'tenant_id'        => $batch->tenant_id,
-                                'branch_id'        => $batch->branch_id,
-                                'employee_code'    => $row['employee_code'],
-                                'name'             => $row['name'],
-                                'designation'      => $row['designation']  ?? null,
-                                'department'       => $row['department']   ?? null,
-                                'pf_number'        => $row['uan']          ?? $row['pf_number']  ?? null,
-                                'esi_number'       => $row['esi']          ?? $row['esi_number'] ?? null,
-                                'basic_salary'     => (float) ($row['basic_salary'] ?? $row['salary'] ?? 0),
-                                'date_of_joining'  => $row['date_of_joining'] ?? $row['doj'] ?? now()->toDateString(),
-                                'status'           => 'active',
-                                'created_at'       => now(),
-                                'updated_at'       => now(),
-                            ]);
+                            DB::table('workforce_employee')->insert(array_merge($employeeFields, [
+                                'tenant_id'       => $batch->tenant_id,
+                                'branch_id'       => $batch->branch_id,
+                                'employee_code'   => $row['employee_code'],
+                                'date_of_joining' => $this->parseDate($row['date_of_joining'] ?? null) ?? now()->toDateString(),
+                                'status'          => 'active',
+                                'created_at'      => now(),
+                                'updated_at'      => now(),
+                            ]));
                         }
                         $inserted++;
                     }
@@ -449,11 +465,12 @@ class DataInputController extends Controller
                             );
                         }
 
-                        $gross       = (float) ($row['gross_salary'] ?? $row['gross'] ?? 0);
-                        $net         = (float) ($row['net_salary']   ?? $row['net']   ?? 0);
-                        $pf          = (float) ($row['pf_employee']  ?? $row['pf']    ?? 0);
-                        $esi         = (float) ($row['esi_employee'] ?? $row['esi']   ?? 0);
-                        $pt          = (float) ($row['professional_tax'] ?? $row['pt'] ?? 0);
+                        // Rows arrive with canonical keys from CsvColumnMapper
+                        $gross = CsvNormalizer::normalizeFloat($row['gross_salary'] ?? null);
+                        $net   = CsvNormalizer::normalizeFloat($row['net_salary']   ?? null);
+                        $pf    = CsvNormalizer::normalizeFloat($row['pf_employee']  ?? null);
+                        $esi   = CsvNormalizer::normalizeFloat($row['esi_employee'] ?? null);
+                        $pt    = CsvNormalizer::normalizeFloat($row['professional_tax'] ?? null);
 
                         if ($gross <= 0) {
                             throw new \InvalidArgumentException(
@@ -471,22 +488,22 @@ class DataInputController extends Controller
                             'branch_id'         => $batch->branch_id,
                             'payroll_cycle_id'  => $cycleId,
                             'employee_id'       => $employeeId,
-                            'total_days_worked' => (int) ($row['working_days'] ?? $row['days_worked'] ?? 26),
-                            'paid_leave_days'   => 0,
-                            'unpaid_leave_days' => (int) ($row['absent'] ?? 0),
-                            'overtime_hours'    => 0,
-                            'basic_earned'      => (float) ($row['basic_salary'] ?? $row['basic'] ?? 0),
-                            'da_earned'         => (float) ($row['da']  ?? 0),
-                            'hra_earned'        => (float) ($row['hra'] ?? 0),
-                            'other_allowances'  => (float) ($row['other_allowances'] ?? 0),
-                            'overtime_wages'    => 0,
+                            'total_days_worked' => CsvNormalizer::normalizeInt($row['total_days_worked'] ?? null, 26),
+                            'paid_leave_days'   => CsvNormalizer::normalizeInt($row['paid_leave_days']   ?? null),
+                            'unpaid_leave_days' => CsvNormalizer::normalizeInt($row['unpaid_leave_days'] ?? null),
+                            'overtime_hours'    => CsvNormalizer::normalizeFloat($row['overtime_hours']  ?? null),
+                            'basic_earned'      => CsvNormalizer::normalizeFloat($row['basic_earned']    ?? null),
+                            'da_earned'         => CsvNormalizer::normalizeFloat($row['da_earned']       ?? null),
+                            'hra_earned'        => CsvNormalizer::normalizeFloat($row['hra_earned']      ?? null),
+                            'other_allowances'  => CsvNormalizer::normalizeFloat($row['other_allowances'] ?? null),
+                            'overtime_wages'    => CsvNormalizer::normalizeFloat($row['overtime_wages']  ?? null),
                             'gross_salary'      => $gross,
                             'pf_employee'       => $pf,
                             'esi_employee'      => $esi,
                             'professional_tax'  => $pt,
-                            'fines'             => 0,
-                            'advances'          => 0,
-                            'other_deductions'  => 0,
+                            'fines'             => CsvNormalizer::normalizeFloat($row['fines']            ?? null),
+                            'advances'          => CsvNormalizer::normalizeFloat($row['advances']         ?? null),
+                            'other_deductions'  => CsvNormalizer::normalizeFloat($row['other_deductions'] ?? null),
                             'total_deductions'  => $gross - $net,
                             'net_salary'        => $net,
                             'payment_date'      => $row['payment_date'] ?? null,
@@ -498,15 +515,14 @@ class DataInputController extends Controller
                     }
 
                 } elseif ($datasetType === 'attendance') {
-                    // Derive the period start date safely — period_from may be null
-                    // on older batches that pre-date the period_month/year columns.
+                    // Derive the period start date safely
                     $periodStart = null;
                     if (! empty($batch->period_from)) {
-                        $periodStart = \Carbon\Carbon::parse($batch->period_from)->toDateString();
+                        $periodStart = \Carbon\Carbon::parse($batch->period_from);
                     } elseif (! empty($batch->period_month) && ! empty($batch->period_year)) {
-                        $periodStart = \Carbon\Carbon::create($batch->period_year, $batch->period_month, 1)->toDateString();
+                        $periodStart = \Carbon\Carbon::create($batch->period_year, $batch->period_month, 1);
                     } else {
-                        $periodStart = now()->startOfMonth()->toDateString();
+                        $periodStart = now()->startOfMonth();
                     }
 
                     foreach ($rows as $row) {
@@ -533,33 +549,66 @@ class DataInputController extends Controller
                         }
 
                         $workingDays = (int) $workingDays;
-                        $absent      = (int) ($row['absent'] ?? 0);
-                        $presentDays = max(0, $workingDays - $absent);
+                        $absentDays  = CsvNormalizer::normalizeInt($row['absent_days'] ?? $row['absent'] ?? null);
+                        $presentDays = max(0, $workingDays - $absentDays);
+                        $otHours     = CsvNormalizer::normalizeFloat($row['overtime_hours'] ?? null);
 
-                        // Use explicit date from CSV, fall back to period start
-                        $attendDate = trim($row['attendance_date'] ?? $row['date'] ?? '');
-                        if ($attendDate === '' || ! strtotime($attendDate)) {
-                            $attendDate = $periodStart;
+                        // If CSV has an explicit date, store single row
+                        $explicitDate = trim($row['attendance_date'] ?? $row['date'] ?? '');
+                        if ($explicitDate !== '' && strtotime($explicitDate)) {
+                            DB::table('workforce_attendance')->updateOrInsert(
+                                [
+                                    'tenant_id'       => $batch->tenant_id,
+                                    'employee_id'     => $employeeId,
+                                    'attendance_date' => $explicitDate,
+                                ],
+                                [
+                                    'branch_id'      => $batch->branch_id,
+                                    'status'         => ($row['attendance_status'] ?? $row['status'] ?? 'present'),
+                                    'overtime_hours' => $otHours,
+                                    'remarks'        => "CSV import: {$presentDays}/{$workingDays} days present",
+                                    'deleted_at'     => null,
+                                    'updated_at'     => now(),
+                                    'created_at'     => now(),
+                                ]
+                            );
+                            $inserted++;
+                            continue;
                         }
 
-                        // Use updateOrInsert to handle re-uploads safely.
-                        // insertOrIgnore silently skips on duplicate key but can
-                        // still trigger a MySQL warning that corrupts JSON output.
-                        DB::table('workforce_attendance')->updateOrInsert(
-                            [
-                                'tenant_id'       => $batch->tenant_id,
-                                'employee_id'     => $employeeId,
-                                'attendance_date' => $attendDate,
-                            ],
-                            [
-                                'branch_id'  => $batch->branch_id,
-                                'status'     => $presentDays > 0 ? 'present' : 'absent',
-                                'remarks'    => "CSV import: {$presentDays}/{$workingDays} days present",
-                                'deleted_at' => null,   // restore if previously soft-deleted
-                                'updated_at' => now(),
-                                'created_at' => now(),  // ignored on update by updateOrInsert
-                            ]
-                        );
+                        // Summary mode: generate one row per working day of the month
+                        // so that date-range queries (FormXVI, Form25, etc.) work correctly.
+                        $daysInMonth  = $periodStart->daysInMonth;
+                        $absentFilled = 0;
+
+                        for ($day = 1; $day <= $daysInMonth; $day++) {
+                            $date = $periodStart->copy()->day($day)->toDateString();
+                            $dayOfWeek = $periodStart->copy()->day($day)->dayOfWeek;
+
+                            // Skip Sundays as weekly off
+                            if ($dayOfWeek === 0) continue;
+
+                            // Mark absent days from the end of the month
+                            $remainingDays = $daysInMonth - $day + 1;
+                            $isAbsent = ($absentFilled < $absentDays) && ($remainingDays <= ($absentDays - $absentFilled));
+                            if ($isAbsent) $absentFilled++;
+
+                            DB::table('workforce_attendance')->updateOrInsert(
+                                [
+                                    'tenant_id'       => $batch->tenant_id,
+                                    'employee_id'     => $employeeId,
+                                    'attendance_date' => $date,
+                                ],
+                                [
+                                    'branch_id'      => $batch->branch_id,
+                                    'status'         => $isAbsent ? 'absent' : 'present',
+                                    'overtime_hours' => ($day === 1) ? $otHours : 0,
+                                    'deleted_at'     => null,
+                                    'updated_at'     => now(),
+                                    'created_at'     => now(),
+                                ]
+                            );
+                        }
                         $inserted++;
                     }
                 }

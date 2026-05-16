@@ -210,7 +210,7 @@
             @forelse($rows ?? [] as $index => $row)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td style="font-size:6px; white-space:nowrap; overflow:hidden;">{{ $row['name'] ?? '' }}</td>
+                <td style="font-size:5.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0;">{{ $row['name'] ?? '' }}</td>
                 <td>{{ ($v = $row['father_name'] ?? '') === 'NIL' ? '' : $v }}</td>
                 <td>{{ ($v = $row['designation'] ?? '') === 'NIL' ? '' : $v }}</td>
                 <td>{{ ($v = $row['act_or_omission'] ?? '') === 'NIL' ? '' : $v }}</td>

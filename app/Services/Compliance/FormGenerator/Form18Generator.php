@@ -5,43 +5,53 @@ namespace App\Services\Compliance\FormGenerator;
 class Form18Generator extends BaseFormGenerator
 {
     protected string $formCode = 'FORM_18';
-    protected string $view = 'compliance.forms.form_18';
+    protected string $view     = 'compliance.forms.form_18';
 
     protected function prepareData(array $rawData): array
     {
+        $tenant = $rawData['tenant'] ?? [];
+        $branch = $rawData['branch'] ?? [];
+        $month  = $rawData['meta']['month'] ?? 1;
+        $year   = $rawData['meta']['year']  ?? date('Y');
+
         $rows = [];
         foreach ($rawData['records'] ?? [] as $record) {
             $record = $this->normalizeRecord($record);
             $rows[] = [
-                'employee_code' => $record['employee_code'] ?? '',
-                'employee_name' => $record['employee_name'] ?? 'N/A',
-                'designation' => $record['designation'] ?? 'N/A',
-                'date_of_joining' => $record['date_of_joining'] ?? 'N/A',
+                'employee_code'   => $record['employee_code']  ?? '',
+                'employee_name'   => $record['employee_name']  ?? '',
+                'father_name'     => $record['father_name']    ?? '',
+                'designation'     => $record['designation']    ?? '',
+                'gender'          => $record['gender']         ?? '',
+                'age'             => $record['age']            ?? '',
+                'esi_number'      => $record['esi_number']     ?? '',
+                'address'         => $record['address']        ?? '',
+                'date_of_joining' => $record['date_of_joining'] ?? '',
+                'incident_date'   => $record['incident_date']  ?? '',
+                'notice_date'     => $record['notice_date']    ?? '',
+                'location'        => $record['location']       ?? '',
+                'cause'           => $record['cause']          ?? '',
+                'injury_type'     => $record['injury_type']    ?? '',
+                'description'     => $record['description']    ?? '',
+                'severity'        => $record['severity']       ?? '',
+                'status'          => $record['status']         ?? '',
+                'remarks'         => $record['remarks']        ?? '',
             ];
         }
 
-        $month = $rawData['meta']['month'] ?? 1;
-        $year = $rawData['meta']['year'] ?? 2024;
-        $tenant = $rawData['tenant'] ?? [];
-        $branch = $rawData['branch'] ?? [];
-
         return [
             'header' => [
-                'form_title' => 'FORM 18 - Register of Child Workers',
-                'period' => $this->formatPeriod($month, $year),
-                'branch' => $branch,
-                'tenant' => is_array($tenant) ? ($tenant['name'] ?? 'N/A') : $tenant,
-                'tenant_details' => $tenant,
-                'factory_name' => $branch['name'] ?? 'N/A',
-                'address' => $branch['address'] ?? 'N/A',
-                'establishment_name' => $tenant['establishment_name'] ?? 'N/A',
-                'owner_name' => $tenant['name'] ?? 'N/A',
-                'place' => $branch['address'] ?? 'N/A',
-                'district' => $branch['district'] ?? 'N/A',
+                'form_title'         => 'FORM 18 - Report of Accident',
+                'establishment_name' => $tenant['establishment_name'] ?? $tenant['name'] ?? '',
+                'factory_name'       => $branch['name']               ?? '',
+                'address'            => $branch['address']            ?? '',
+                'period'             => $this->formatPeriod($month, $year),
+                'branch'             => $branch,
+                'tenant'             => $tenant,
             ],
-            'rows' => $rows,
+            'rows'   => $rows,
             'totals' => [],
-            'is_nil' => count($rows) === 0,
+            'is_nil' => empty($rows),
         ];
     }
 }

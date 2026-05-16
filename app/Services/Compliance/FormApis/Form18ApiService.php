@@ -12,6 +12,7 @@ class Form18ApiService extends BaseFormApiService
         $this->validateTenantAndBranch($tenantId, $branchId);
 
         $rows = DB::table('incidents as i')
+            ->leftJoin('workforce_employee as e', 'i.employee_id', '=', 'e.id')
             ->where('i.tenant_id', $tenantId)
             ->where('i.branch_id', $branchId)
             ->whereYear('i.incident_date', $year)
@@ -22,19 +23,33 @@ class Form18ApiService extends BaseFormApiService
                 'i.description',
                 'i.severity',
                 'i.status',
+                'i.location',
+                'i.cause',
+                'i.injury_type',
+                'i.notice_date',
+                'i.remarks',
+                'e.name as employee_name',
+                'e.employee_code',
+                'e.father_name',
+                'e.designation',
+                'e.gender',
+                'e.esi_number',
+                'e.permanent_address as address',
+                DB::raw('TIMESTAMPDIFF(YEAR, e.date_of_birth, CURDATE()) as age'),
+                'e.date_of_joining',
             ])
             ->orderBy('i.incident_date')
             ->get()
-            ->map(fn($row) => (array)$row)
+            ->map(fn($row) => (array) $row)
             ->toArray();
 
         return [
             'records' => $rows,
-            'meta' => [
+            'meta'    => [
                 'tenant_id' => $tenantId,
                 'branch_id' => $branchId,
-                'month' => $month,
-                'year' => $year,
+                'month'     => $month,
+                'year'      => $year,
             ],
             'tenant' => $this->getTenantDetails($tenantId),
             'branch' => $this->getBranchDetails($branchId, $tenantId),

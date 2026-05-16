@@ -18,24 +18,36 @@ class EPFInspectionApiService extends BaseFormApiService
             ->where('e.branch_id', $branchId)
             ->whereYear('pc.period_from', $year)
             ->whereMonth('pc.period_from', $month)
-            ->select([
-                'e.employee_code',
-                'e.name',
-                'pe.gross_salary',
-                'pe.pf_employee',
-            ])
+            ->selectRaw("
+                e.employee_code,
+                e.name,
+                e.father_name,
+                e.designation,
+                COALESCE(e.uan_number, e.pf_number) AS uan,
+                e.pf_number,
+                e.esi_number,
+                e.date_of_joining,
+                COALESCE(NULLIF(pe.basic_earned,0), e.basic_salary, 0) AS basic_earned,
+                COALESCE(pe.da_earned, 0)           AS da_earned,
+                pe.gross_salary                     AS gross_salary,
+                COALESCE(pe.pf_employee, 0)         AS pf_employee,
+                COALESCE(pe.pf_employee, 0)         AS pf_employer,
+                COALESCE(pe.esi_employee, 0)        AS esi_employee,
+                pe.total_days_worked                AS total_days_worked,
+                pe.net_salary                       AS net_salary
+            ")
             ->orderBy('e.employee_code')
             ->get()
-            ->map(fn($row) => (array)$row)
+            ->map(fn($row) => (array) $row)
             ->toArray();
 
         return [
             'records' => $rows,
-            'meta' => [
+            'meta'    => [
                 'tenant_id' => $tenantId,
                 'branch_id' => $branchId,
-                'month' => $month,
-                'year' => $year,
+                'month'     => $month,
+                'year'      => $year,
             ],
             'tenant' => $this->getTenantDetails($tenantId),
             'branch' => $this->getBranchDetails($branchId, $tenantId),

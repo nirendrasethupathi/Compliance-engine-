@@ -18,34 +18,34 @@ class ShopsFormCApiService extends BaseFormApiService
             ->where('e.branch_id', $branchId)
             ->whereYear('pc.period_from', $year)
             ->whereMonth('pc.period_from', $month)
-            ->select([
-                'e.employee_code',
-                'e.name as employee_name',
-                'e.father_name',
-                'e.date_of_birth',
-                'e.designation',
-                'pe.total_days_worked as days_worked',
-                'pe.gross_salary as total_wages',
-                DB::raw('0 as bonus_amount'),
-                DB::raw('0 as puja_bonus'),
-                DB::raw('0 as interim_bonus'),
-                'pe.professional_tax as tax_deducted',
-                'pe.other_deductions as loss_deduction',
-                DB::raw('0 as bonus_paid'),
-                DB::raw('NULL as bonus_payment_date'),
-            ])
+            ->selectRaw("
+                e.employee_code,
+                e.name                                  AS employee_name,
+                e.father_name,
+                e.date_of_birth,
+                e.designation,
+                pe.total_days_worked                    AS days_worked,
+                pe.gross_salary                         AS total_wages,
+                0                                       AS bonus_amount,
+                0                                       AS puja_bonus,
+                0                                       AS interim_bonus,
+                COALESCE(pe.professional_tax, 0)        AS tax_deducted,
+                COALESCE(pe.other_deductions, 0)        AS loss_deduction,
+                0                                       AS bonus_paid,
+                NULL                                    AS bonus_payment_date
+            ")
             ->orderBy('e.employee_code')
             ->get()
-            ->map(fn($row) => (array)$row)
+            ->map(fn($row) => (array) $row)
             ->toArray();
 
         return [
             'records' => $rows,
-            'meta' => [
+            'meta'    => [
                 'tenant_id' => $tenantId,
                 'branch_id' => $branchId,
-                'month' => $month,
-                'year' => $year,
+                'month'     => $month,
+                'year'      => $year,
             ],
             'tenant' => $this->getTenantDetails($tenantId),
             'branch' => $this->getBranchDetails($branchId, $tenantId),

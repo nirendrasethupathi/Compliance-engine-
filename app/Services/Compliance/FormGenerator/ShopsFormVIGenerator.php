@@ -19,8 +19,8 @@ class ShopsFormVIGenerator extends BaseFormGenerator
             if (!isset($employeeMap[$code])) {
                 $employeeMap[$code] = [
                     'employee_name' => $record['name'] ?? 'N/A',
-                    'ticket' => $code,
-                    'holidays' => [],
+                    'ticket'        => $record['father_name'] ?? $record['employee_code'] ?? '',
+                    'holidays'      => [],
                 ];
             }
             $employeeMap[$code]['holidays'][] = [

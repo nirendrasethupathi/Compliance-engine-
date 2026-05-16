@@ -17,10 +17,11 @@ class FormXVIGenerator extends BaseFormGenerator
 
             if (!isset($employees[$empCode])) {
                 $employees[$empCode] = [
-                    'name' => $record['name'] ?? '',
+                    'name'        => $record['name']        ?? '',
                     'father_name' => $record['father_name'] ?? '',
-                    'sex' => $record['sex'] ?? '',
-                    'remarks' => '',
+                    'sex'         => $record['sex']         ?? '',
+                    'designation' => $record['designation'] ?? '',
+                    'remarks'     => '',
                 ];
                 for ($i = 1; $i <= 31; $i++) {
                     $employees[$empCode]["day_$i"] = '';

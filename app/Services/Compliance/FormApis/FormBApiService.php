@@ -18,44 +18,44 @@ class FormBApiService extends BaseFormApiService
             ->where('e.branch_id', $branchId)
             ->whereYear('pc.period_from', $year)
             ->whereMonth('pc.period_from', $month)
-            ->select([
-                'e.employee_code',
-                'e.name as employee_name',
-                DB::raw("COALESCE(e.pf_number, '') as uan"),
-                DB::raw('COALESCE(e.basic_salary, pe.basic_earned, 0) as rate_of_wage'),
-                'pe.basic_earned',
-                'pe.total_days_worked',
-                DB::raw('COALESCE(pe.overtime_hours, 0) as overtime_hours'),
-                DB::raw('COALESCE(pe.da_earned, 0) as da_earned'),
-                DB::raw('COALESCE(pe.hra_earned, 0) as hra_earned'),
-                DB::raw('COALESCE(pe.other_allowances, 0) as special_allowance'),
-                DB::raw('COALESCE(pe.overtime_wages, 0) as overtime_wages'),
-                DB::raw('0 as other_earnings'),
-                'pe.gross_salary',
-                DB::raw('COALESCE(pe.pf_employee, 0) as pf_employee'),
-                DB::raw('0 as pf_employer'),
-                DB::raw('COALESCE(pe.esi_employee, 0) as esi_employee'),
-                DB::raw('COALESCE(pe.other_deductions, 0) as other_deductions'),
-                DB::raw('COALESCE(pe.professional_tax, 0) as pt_deduction'),
-                DB::raw('COALESCE(pe.advances, 0) as recovery'),
-                'pe.total_deductions',
-                'pe.net_salary',
-                DB::raw("COALESCE(pe.payment_date, '') as payment_date"),
-                DB::raw("COALESCE(pe.transaction_reference, '') as bank_transaction_id"),
-                DB::raw("'' as remarks"),
-            ])
+            ->selectRaw("
+                e.employee_code,
+                e.name                                          AS employee_name,
+                COALESCE(e.uan_number, e.pf_number, '')        AS uan,
+                COALESCE(e.basic_salary, pe.basic_earned, 0)   AS rate_of_wage,
+                COALESCE(NULLIF(pe.basic_earned,0), e.basic_salary, 0) AS basic_earned,
+                pe.total_days_worked                            AS total_days_worked,
+                COALESCE(pe.overtime_hours, 0)                 AS overtime_hours,
+                COALESCE(pe.da_earned, 0)                      AS da_earned,
+                COALESCE(pe.hra_earned, 0)                     AS hra_earned,
+                COALESCE(pe.other_allowances, 0)               AS special_allowance,
+                COALESCE(pe.overtime_wages, 0)                 AS overtime_wages,
+                0                                              AS other_earnings,
+                pe.gross_salary                                AS gross_salary,
+                COALESCE(pe.pf_employee, 0)                    AS pf_employee,
+                0                                              AS pf_employer,
+                COALESCE(pe.esi_employee, 0)                   AS esi_employee,
+                COALESCE(pe.other_deductions, 0)               AS other_deductions,
+                COALESCE(pe.professional_tax, 0)               AS pt_deduction,
+                COALESCE(pe.advances, 0)                       AS recovery,
+                pe.total_deductions                            AS total_deductions,
+                pe.net_salary                                  AS net_salary,
+                COALESCE(pe.payment_date, '')                  AS payment_date,
+                COALESCE(pe.transaction_reference, '')         AS bank_transaction_id,
+                ''                                             AS remarks
+            ")
             ->orderBy('e.employee_code')
             ->get()
-            ->map(fn($row) => (array)$row)
+            ->map(fn($row) => (array) $row)
             ->toArray();
 
         return [
             'records' => $rows,
-            'meta' => [
+            'meta'    => [
                 'tenant_id' => $tenantId,
                 'branch_id' => $branchId,
-                'month' => $month,
-                'year' => $year,
+                'month'     => $month,
+                'year'      => $year,
             ],
             'tenant' => $this->getTenantDetails($tenantId),
             'branch' => $this->getBranchDetails($branchId, $tenantId),

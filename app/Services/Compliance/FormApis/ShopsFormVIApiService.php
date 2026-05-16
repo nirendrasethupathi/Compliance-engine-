@@ -20,6 +20,7 @@ class ShopsFormVIApiService extends BaseFormApiService
             ->select([
                 'we.employee_code',
                 'we.name',
+                'we.father_name',
                 'wa.attendance_date',
                 'wa.status',
             ])

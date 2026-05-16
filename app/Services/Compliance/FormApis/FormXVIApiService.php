@@ -15,12 +15,16 @@ class FormXVIApiService extends BaseFormApiService
             ->join('workforce_employee as we', 'we.id', '=', 'wa.employee_id')
             ->where('we.tenant_id', $tenantId)
             ->where('we.branch_id', $branchId)
+            ->whereNull('we.deleted_at')
             ->whereYear('wa.attendance_date', $year)
             ->whereMonth('wa.attendance_date', $month)
+            ->whereNull('wa.deleted_at')
             ->select([
                 'we.employee_code',
                 'we.name',
+                'we.father_name',
                 'we.designation',
+                'we.gender as sex',
                 'wa.attendance_date',
                 'wa.status',
             ])
