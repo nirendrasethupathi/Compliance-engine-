@@ -81,15 +81,18 @@ class FORMDERGenerator extends BaseFormGenerator
         // for consistency — but all Blade-required vars are at root level too.
         return [
             'header' => [
-                'form_title'       => 'FORM D - Equal Remuneration Register',
-                'period'           => $period,
-                'company_name'     => $tenant['establishment_name'] ?? $tenant['name'] ?? '',
-                'contractor_name'  => $tenant['name'] ?? '',
-                'work_location'    => $branch['address'] ?? $branch['name'] ?? '',
+                'form_title'         => 'FORM D - Equal Remuneration Register',
+                'period'             => $period,
+                'establishment_name' => $tenant['establishment_name'] ?? $tenant['name'] ?? '',
+                'company_name'       => $tenant['establishment_name'] ?? $tenant['name'] ?? '',
+                'contractor_name'    => $tenant['name'] ?? '',
+                'work_location'      => $branch['address'] ?? $branch['name'] ?? '',
                 'principal_employer' => $tenant['name'] ?? '',
-                'total_workers'    => $totalMen + $totalWomen,
-                'total_men'        => $totalMen,
-                'total_women'      => $totalWomen,
+                'total_workers'      => $totalMen + $totalWomen,
+                'total_men'          => $totalMen,
+                'total_women'        => $totalWomen,
+                'tenant'             => $tenant,
+                'branch'             => $branch,
             ],
             // Root-level vars the Blade reads directly
             'company_name'      => $tenant['establishment_name'] ?? $tenant['name'] ?? '',

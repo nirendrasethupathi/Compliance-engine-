@@ -14,6 +14,50 @@ class ComplianceDataUploadController extends Controller
         return view('compliance.csv_upload');
     }
 
+    public function downloadTemplate(string $type = 'employees')
+    {
+        $templates = [
+            'employees' => [
+                'filename' => 'sample_employees.csv',
+                'content'  => implode("\n", [
+                    'employee_code,name,father_name,date_of_birth,gender,mobile,designation,department,date_of_joining,uan,esic_ip,pf_number,pan,bank_account,bank_name,ifsc,basic_salary,permanent_address,status',
+                    'EMP001,Arumugam S,Subramaniam A,1985-06-15,Male,9876543210,Supervisor,Production,2020-01-10,100123456789,1234567890,PF001234,ABCDE1234F,12345678901234,State Bank of India,SBIN0001234,18000,12 Main Road Chennai TN 600001,active',
+                    'EMP002,Balamurugan K,Krishnan B,1990-03-22,Male,9876543211,Technician,Maintenance,2021-04-01,100123456790,1234567891,PF001235,FGHIJ5678K,12345678901235,Indian Bank,IDIB000M123,15000,45 Anna Nagar Chennai TN 600040,active',
+                    'EMP003,Kavitha R,Rajan P,1992-11-08,Female,9876543212,Clerk,Administration,2022-07-15,100123456791,1234567892,PF001236,KLMNO9012L,12345678901236,Canara Bank,CNRB0001234,12000,78 T Nagar Chennai TN 600017,active',
+                ]),
+            ],
+            'payroll' => [
+                'filename' => 'sample_payroll.csv',
+                'content'  => implode("\n", [
+                    'employee_code,gross_salary,basic_salary,hra,conveyance,other_allowance,overtime,bonus,deductions,pf,esi,professional_tax,net_salary,salary_month,salary_year',
+                    'EMP001,18000,9000,3600,1600,3800,0,0,1956,1080,135,200,16044,1,2025',
+                    'EMP002,15000,7500,3000,1600,2900,500,0,1631,900,113,200,13869,1,2025',
+                    'EMP003,12000,6000,2400,1600,2000,0,0,1304,720,90,200,10696,1,2025',
+                ]),
+            ],
+            'attendance' => [
+                'filename' => 'sample_attendance.csv',
+                'content'  => implode("\n", [
+                    'employee_code,working_days,present_days,absent_days,weekly_off,paid_leave,ot_hours,attendance_month,attendance_year',
+                    'EMP001,26,26,0,4,0,0,1,2025',
+                    'EMP002,26,25,1,4,0,4,1,2025',
+                    'EMP003,26,24,2,4,1,0,1,2025',
+                ]),
+            ],
+        ];
+
+        if (! isset($templates[$type])) {
+            abort(404);
+        }
+
+        $tpl = $templates[$type];
+
+        return response($tpl['content'], 200, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $tpl['filename'] . '"',
+        ]);
+    }
+
     public function upload(Request $request)
     {
         // Validate file presence and period — always returns JSON on failure

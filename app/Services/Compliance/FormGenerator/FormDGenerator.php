@@ -47,6 +47,12 @@ class FormDGenerator extends BaseFormGenerator
             Log::info("FormDGenerator: Built rows", ['row_count' => count($rows)]);
 
             $result = [
+                'header' => [
+                    'establishment_name' => $rawData['tenant']['name'] ?? '',
+                    'owner_name'         => $rawData['tenant']['owner_name'] ?? '',
+                    'tenant'             => $rawData['tenant'] ?? [],
+                    'branch'             => $rawData['branch'] ?? [],
+                ],
                 'establishment_name' => $rawData['tenant']['name'] ?? '',
                 'owner_name' => $rawData['tenant']['owner_name'] ?? '',
                 'month_name' => $this->getMonthName($rawData['meta']['month'] ?? 1),

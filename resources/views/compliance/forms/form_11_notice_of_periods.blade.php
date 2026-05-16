@@ -1,5 +1,3 @@
-@extends('compliance.layouts.preview')
-
 <!DOCTYPE html>
 <html>
 <head>

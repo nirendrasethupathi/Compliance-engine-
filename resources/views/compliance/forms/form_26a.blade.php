@@ -75,12 +75,6 @@
         }
         .footer-left { flex: 1; }
         .footer-right { flex: 1; text-align: right; }
-        .signature-line {
-            margin-top: 30px;
-            border-top: 1px solid #000;
-            width: 150px;
-            margin-left: auto;
-        }
         .signature-label { margin-top: 2px; font-weight: bold; text-align: right; }
     </style>
 </head>
@@ -99,11 +93,11 @@
         <div class="factory-details">
             <div class="detail-row">
                 <span class="detail-label">Name and address of the factory</span>
-                <span class="detail-line">{{ $header['factory_name'] ?? '' }} {{ $header['factory_address'] ?? '' }}</span>
+                <span class="detail-line" style="border-bottom:none;">{{ $header['factory_name'] ?? '' }} {{ $header['factory_address'] ?? '' }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Registration number of the factory</span>
-                <span class="detail-line">{{ $header['registration_number'] ?? '' }}</span>
+                <span class="detail-line" style="border-bottom:none;">{{ $header['registration_number'] ?? '' }}</span>
             </div>
         </div>
         </div>
@@ -167,10 +161,9 @@
         <div class="form-inner">
         <div class="footer-section">
             <div class="footer-left">
-                <div>Date: ___________________</div>
+                <div>Date:</div>
             </div>
             <div class="footer-right">
-                <div class="signature-line"></div>
                 <div class="signature-label"><strong>Signature of Manager</strong></div>
             </div>
         </div>

@@ -1,352 +1,119 @@
-@extends('compliance.layouts.preview')
-
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>FORM 11 - Notice of Periods of Work</title>
+    <title>FORM 2 - Notice of Periods of Work</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            padding: 12px;
-            font-size: 9px;
-        }
-        .form-container {
-            border: 1px solid black;
-            padding: 10px;
-            margin: 0 auto;
-            width: 99%;
-        }
-        .form-header {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 10px;
-        }
-        .form-header div {
-            margin: 2px 0;
-        }
-        .relay-col{
-            font-size:7px;
-        }
-        .header-title {
-            font-weight: bold;
-        }
-        .factory-details {
-            margin-bottom: 8px;
-            font-size: 9px;
-        }
-        .line-value{
-            font-size:8px;
-            padding-left:3px;
-        }
-        .detail-row {
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-        }
-        .detail-label {
-            font-weight: bold;
-            width: 20%;
-            margin-right: 5px;
-        }
-        .detail-line {
-            flex: 1;
-            border-bottom: 1px solid black;
-            height: 10px;
-        }
-        .detail-row-two-col {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 4px;
-        }
-        .detail-col {
-            flex: 1;
-            display: flex;
-            align-items: center;
-        }
-        .time-line{
-            display:inline-block;
-            border-bottom:1px solid black;
-            width:30px;
-            margin-left:3px;
-        }
-        .work-periods-table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid black;
-            font-size: 8px;
-            margin-bottom: 8px;
-        }
-        .work-periods-table th,
-        .work-periods-table td {
-            border: 1px solid black;
-            padding: 2px 2px;
-            text-align: center;
-            vertical-align: middle;
-            height: 16px;
-        }
-        .work-periods-table th {
-            font-weight: bold;
-            background-color: #fff;
-            line-height: 1.1;
-        }
-        .label-col {
-            text-align: left;
-            font-weight: bold;
-            width: 12%;
-        }
-        .group-col {
-            width: 5%;
-        }
-        .time-col {
-            width: 4%;
-        }
-        .line-field {
-            border-bottom: 1px solid black;
-            padding: 1px 2px;
-            text-align: center;
-            font-size: 8px;
-        }
-        .description-table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1px solid black;
-            font-size: 9px;
-            margin-bottom: 8px;
-        }
-        .description-table th,
-        .description-table td {
-            border: 1px solid black;
-            padding: 3px 4px;
-            text-align: left;
-            vertical-align: middle;
-        }
-        .description-table th {
-            font-weight: bold;
-            background-color: #fff;
-        }
-        .footer-section {
-            margin-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 9px;
-        }
-        .footer-left {
-            flex: 1;
-        }
-        .footer-right {
-            flex: 1;
-            text-align: right;
-        }
-        .signature-line {
-            margin-top: 30px;
-            border-top: 1px solid #000;
-            width: 150px;
-            margin-left: auto;
-        }
-        .signature-label {
-            margin-top: 2px;
-            font-weight: bold;
-            text-align: right;
-        }
+        @page { size: A4 landscape; margin: 10mm; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; font-size: 6px; color: #000; padding-top: 2px; }
+        .hdr { text-align: center; margin-bottom: 4px; line-height: 1.4; }
+        .ft { width: 100%; border-collapse: collapse; margin-bottom: 3px; }
+        .ft td { font-size: 7px; padding: 1px 2px; border-bottom: 1px solid #000; }
+        .ft td.l { font-weight: bold; width: 80pt; }
+        .mt { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 5.5px; margin-bottom: 4px; }
+        .mt th, .mt td { border: 1px solid #000; padding: 0; text-align: center; vertical-align: middle; height: 12px; line-height: 1; overflow: hidden; }
+        .mt th { font-weight: bold; font-size: 5.5px; }
+        .lc { text-align: left !important; font-weight: bold; font-size: 5.5px; width: 7%; }
+        .sig { width: 100%; border-collapse: collapse; font-size: 7px; margin-top: 4px; }
+        .sig td { padding: 1px 0; vertical-align: bottom; }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <!-- Header -->
-        <div class="form-header">
-            <div>The Tamil Nadu Factories Rules</div>
-            <div class="header-title">FORM 11</div>
-            <div>(Prescribed under Rule 79)</div>
-            <div class="header-title">Notice of Periods of work for adult workers and children</div>
-        </div>
 
-        <!-- Factory Details -->
-        <div class="factory-details">
-            <div class="detail-row">
-                <div class="detail-label">Name of factory</div>
-                <div class="detail-line"><span class="line-value">{{ $factory_name ?? 'NIL' }}</span></div>
-            </div>
+{{-- Outer border as a single table --}}
+<table cellspacing="0" cellpadding="4" style="width:99%;margin-left:auto;margin-right:auto;border-top:2px solid #000;border-left:2px solid #000;border-right:2px solid #000;border-bottom:2px solid #000;">
+<tr>
+<td style="padding:4px;border-top:1px solid #000;border-left:1px solid #000;border-right:1px solid #000;border-bottom:1px solid #000;">
 
-            <div class="detail-row-two-col">
-                <div class="detail-col">
-                    <div class="detail-label" style="width: 30%;">Place</div>
-                    <div class="detail-line"><span class="line-value">{{ $place ?? 'NIL' }}</span></div>
-                </div>
-                <div class="detail-col">
-                    <div class="detail-label" style="width: 30%;">District</div>
-                    <div class="detail-line"><span class="line-value">{{ $district ?? 'NIL' }}</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Work Periods Table -->
-        <table class="work-periods-table">
-            <thead>
-                <tr>
-                    <th rowspan="2" class="label-col">Periods of work</th>
-
-                    <th colspan="9">Men</th>
-                    <th colspan="9">Women</th>
-                    <th colspan="9">Children</th>
-
-                    <th colspan="2">Description of groups</th>
-                </tr>
-
-                <tr>
-                    <th colspan="9">Total number of men employed</th>
-                    <th colspan="9">Total number of women employed</th>
-                    <th colspan="9">Total number of children employed</th>
-
-                    <th>Group letter</th>
-                    <th>Nature of work</th>
-                </tr>
-                <tr>
-                    <th class="label-col">Groups</th>
-                    <th colspan="3">A</th>
-                    <th colspan="3">B</th>
-                    <th colspan="3">C</th>
-
-                    <th colspan="3">D</th>
-                    <th colspan="3">E</th>
-                    <th colspan="3">F</th>
-
-                    <th colspan="3">G</th>
-                    <th colspan="3">H</th>
-                    <th colspan="3">I</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th class="label-col">Relays</th>
-
-                    <td>1</td><td>2</td><td>3</td>
-                    <td>1</td><td>2</td><td>3</td>
-                    <td>1</td><td>2</td><td>3</td>
-
-                    <td>1</td><td>2</td><td>3</td>
-                    <td>1</td><td>2</td><td>3</td>
-                    <td>1</td><td>2</td><td>3</td>
-
-                    <td>1</td><td>2</td><td>3</td>
-                    <td>1</td><td>2</td><td>3</td>
-                    <td>1</td><td>2</td><td>3</td>
-
-                    <td></td>
-                    <td></td>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- On working days -->
-                <tr>
-                    <td class="label-col" rowspan="6"><strong>On working days</strong></td>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">A</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">B</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">C</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">D</td>
-                    <td></td>
-                </tr>
-                <tr>
-                   @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">E</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">F</td>
-                    <td></td>
-                </tr>
-                <!-- On partial working days -->
-                <tr>
-                    <td class="label-col" rowspan="6"><strong>On partial working days</strong></td>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">G</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">H</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td class="group-col">I</td>
-                    <td></td>
-                </tr>
-                <tr>
-
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td></td>
-                    <td></td>
-                </tr>
-                   <tr>
-
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td></td>
-                    <td></td>
-                </tr>
-                   <tr>
-
-                    @for($i=0;$i<27;$i++)
-                        <td></td>
-                    @endfor
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-
-
-
-        <!-- Footer -->
-        <div class="footer-section">
-            <div class="footer-left">
-                <div>Date on which this notice was first exhibited weekly holidays: ___________</div>
-            </div>
-            <div class="footer-right">
-                <div class="signature-line"></div>
-                <div class="signature-label">(Signed) Manager</div>
-            </div>
-        </div>
+    <div class="hdr">
+        <div style="font-size:7px;">The Tamil Nadu Factories Rules</div>
+        <div style="font-weight:bold;font-size:8px;">FORM 2</div>
+        <div style="font-size:7px;">(Prescribed under Rule 79)</div>
+        <div style="font-weight:bold;font-size:7px;">Notice of Periods of work for adult workers and children</div>
     </div>
+
+    <table class="ft">
+        <tr><td class="l">Name of factory</td><td>{{ $header['factory_name'] ?? $factory_name ?? 'NIL' }}</td></tr>
+        <tr><td class="l">Place</td><td>{{ $header['place'] ?? $place ?? 'NIL' }}</td></tr>
+        <tr><td class="l">District</td><td>{{ $header['district'] ?? $district ?? 'NIL' }}</td></tr>
+    </table>
+
+    {{-- 31 cols in 750pt: label=40pt, 27 data cols=20pt each(540pt), grp=20pt, nature=30pt = 40+540+20+30=630... pad remaining --}}
+    <table class="mt">
+        <colgroup>
+            <col style="width:7%">
+            @for($i=0;$i<27;$i++)<col style="width:2.9%">@endfor
+            <col style="width:2.7%">
+            <col style="width:4%">
+        </colgroup>
+        <thead>
+            <tr>
+                <th rowspan="4" class="lc">Periods<br>of work</th>
+                <th colspan="9">Men</th>
+                <th colspan="9">Women</th>
+                <th colspan="9">Children</th>
+                <th rowspan="2" colspan="2">Desc.<br>of groups</th>
+            </tr>
+            <tr>
+                <th colspan="9">Total number of men employed</th>
+                <th colspan="9">Total number of women employed</th>
+                <th colspan="9">Total number of children employed</th>
+            </tr>
+            <tr>
+                <th colspan="3">A</th><th colspan="3">B</th><th colspan="3">C</th>
+                <th colspan="3">D</th><th colspan="3">E</th><th colspan="3">F</th>
+                <th colspan="3">G</th><th colspan="3">H</th><th colspan="3">I</th>
+                <th>Grp</th><th>Nature</th>
+            </tr>
+            <tr>
+                @for($i=0;$i<27;$i++)<th>{{ ($i%3)+1 }}</th>@endfor
+                <th></th><th></th>
+            </tr>
+            <tr>
+                <th class="lc">Relays</th>
+                @for($i=0;$i<27;$i++)<th>{{ ($i%3)+1 }}</th>@endfor
+                <th></th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @php $wg = ['A','B','C','D','E','F']; @endphp
+            @foreach($wg as $i => $g)
+            <tr>
+                @if($i===0)<td class="lc" rowspan="6">On<br>working<br>days</td>@endif
+                @for($c=0;$c<27;$c++)<td></td>@endfor
+                <td>{{ $g }}</td><td></td>
+            </tr>
+            @endforeach
+            @php $pg = ['G','H','I','','','']; @endphp
+            @foreach($pg as $i => $g)
+            <tr>
+                @if($i===0)<td class="lc" rowspan="6">On<br>partial<br>working<br>days</td>@endif
+                @for($c=0;$c<27;$c++)<td></td>@endfor
+                <td>{{ $g }}</td><td></td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <table class="sig">
+        <tr>
+            <td style="width:55%;vertical-align:bottom;">Date on which this notice was first exhibited weekly holidays: ___________</td>
+            <td style="width:45%;text-align:right;vertical-align:bottom;">
+                <table cellspacing="0" style="width:150pt;margin-left:auto;border-collapse:collapse;margin-top:50px;">
+                    <tr>
+                        <td style="border-top:1px solid #000;text-align:center;font-weight:bold;padding-top:3px;font-size:7px;">
+                            (Signed) Manager
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</td>
+</tr>
+</table>
+
 </body>
 </html>

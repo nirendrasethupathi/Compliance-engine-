@@ -27,7 +27,7 @@ class FormGeneratorFactory
         'FormA' => FormAGenerator::class,
         'FormC' => FormCGenerator::class,
         'FormD' => FormDGenerator::class,
-        'FormDER' => FormDERGenerator::class,
+        'FormDER' => FORMDERGenerator::class,
 
         // Incident Forms
         'Form11' => Form11Generator::class,

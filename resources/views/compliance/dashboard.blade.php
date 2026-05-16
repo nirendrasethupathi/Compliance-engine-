@@ -604,32 +604,44 @@
                                 <div class="row g-3">
 
                                     <div class="col-md-4">
-                                        <div class="p-3 border rounded h-100">
+                                        <div class="p-3 border rounded h-100 d-flex flex-column">
                                             <label class="form-label"><strong>👥 Employees CSV</strong> <span class="text-danger">*</span></label>
                                             <input type="file" class="form-control csv-file-input" id="csvEmployees"
                                                    data-type="employees" accept=".csv,.txt" required>
                                             <div class="form-text">Required: <code>employee_code, name</code></div>
                                             <div class="mt-2" id="csv-status-employees"></div>
+                                            <div class="mt-auto pt-3 border-top">
+                                                <div class="text-muted" style="font-size:11px; margin-bottom:4px;">📥 Sample CSV Format</div>
+                                                <a href="/compliance/csv-template/employees" class="btn btn-outline-secondary btn-sm w-100" download>⬇️ Download Template</a>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="p-3 border rounded h-100">
+                                        <div class="p-3 border rounded h-100 d-flex flex-column">
                                             <label class="form-label"><strong>💰 Payroll CSV</strong> <span class="text-danger">*</span></label>
                                             <input type="file" class="form-control csv-file-input" id="csvPayroll"
                                                    data-type="payroll" accept=".csv,.txt" required>
                                             <div class="form-text">Required: <code>employee_code, gross_salary, net_salary</code></div>
                                             <div class="mt-2" id="csv-status-payroll"></div>
+                                            <div class="mt-auto pt-3 border-top">
+                                                <div class="text-muted" style="font-size:11px; margin-bottom:4px;">📥 Sample CSV Format</div>
+                                                <a href="/compliance/csv-template/payroll" class="btn btn-outline-secondary btn-sm w-100" download>⬇️ Download Template</a>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="p-3 border rounded h-100">
+                                        <div class="p-3 border rounded h-100 d-flex flex-column">
                                             <label class="form-label"><strong>📅 Attendance CSV</strong> <span class="text-danger">*</span></label>
                                             <input type="file" class="form-control csv-file-input" id="csvAttendance"
                                                    data-type="attendance" accept=".csv,.txt" required>
                                             <div class="form-text">Required: <code>employee_code, working_days</code></div>
                                             <div class="mt-2" id="csv-status-attendance"></div>
+                                            <div class="mt-auto pt-3 border-top">
+                                                <div class="text-muted" style="font-size:11px; margin-bottom:4px;">📥 Sample CSV Format</div>
+                                                <a href="/compliance/csv-template/attendance" class="btn btn-outline-secondary btn-sm w-100" download>⬇️ Download Template</a>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -737,11 +749,13 @@
                     // Guard: always read as text first, then parse — prevents
                     // JSON.parse crash when server returns HTML on fatal errors.
                     const rawText = await res.text();
+                    // Strip UTF-8 BOM (\uFEFF) that some PHP environments prepend
+                    const cleanText = rawText.replace(/^\uFEFF/, '').trim();
                     let data;
                     try {
-                        data = JSON.parse(rawText);
+                        data = JSON.parse(cleanText);
                     } catch (_) {
-                        console.error(`[CSV Upload] Non-JSON response for ${type} (HTTP ${res.status}):`, rawText.slice(0, 400));
+                        console.error(`[CSV Upload] Non-JSON response for ${type} (HTTP ${res.status}):`, cleanText.slice(0, 400));
                         data = { status: 'error', message: `Server error (HTTP ${res.status}) — check browser console for details` };
                     }
 

@@ -10,56 +10,61 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             font-size: 8px;
-            padding: 8px;
+            background: #fff;
+            padding: 6px;
+        }
+        .page-wrap {
+            width: 760px;
+            margin: 0 auto;
         }
         .form-container {
-            border: 2px solid black;
-            padding: 10px;
+            border: 1.5px solid black;
+            padding: 8px 10px;
+            width: 100%;
         }
 
         /* ── Header ── */
         .form-header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 9px;
-            line-height: 1.6;
+            line-height: 1.4;
         }
-        .red-bold  { font-weight: bold; color: #c00; }
-        .black-bold{ font-weight: bold; }
+        .black-bold { font-weight: bold; }
 
         /* ── Certifying Surgeon ── */
-        .surgeon-section { margin-bottom: 10px; font-size: 8.5px; }
-        .surgeon-section .sec-title { font-weight: bold; margin-bottom: 4px; }
+        .surgeon-section { margin-bottom: 8px; font-size: 8px; }
+        .surgeon-section .sec-title { font-weight: bold; margin-bottom: 3px; }
         .surgeon-row {
             display: flex;
             align-items: flex-end;
-            margin-bottom: 6px;
-            gap: 6px;
+            margin-bottom: 4px;
+            gap: 5px;
         }
-        .surgeon-label { font-weight: bold; width: 20px; flex-shrink: 0; }
+        .surgeon-label { font-weight: bold; width: 18px; flex-shrink: 0; }
         .surgeon-name-line {
             flex: 1;
             border-bottom: 1px solid #000;
-            min-height: 14px;
+            min-height: 12px;
         }
-        .period-group { display: flex; gap: 16px; flex-shrink: 0; }
-        .period-item  { display: flex; align-items: flex-end; gap: 4px; }
-        .period-item span { white-space: nowrap; }
-        .period-line  { border-bottom: 1px solid #000; width: 80px; min-height: 14px; }
+        .period-group { display: flex; gap: 12px; flex-shrink: 0; }
+        .period-item  { display: flex; align-items: flex-end; gap: 3px; }
+        .period-item span { white-space: nowrap; font-size: 8px; }
+        .period-line  { border-bottom: 1px solid #000; width: 70px; min-height: 12px; }
 
         /* ── Main Table ── */
         .register-table {
             width: 100%;
             border-collapse: collapse;
             border: 1px solid black;
-            font-size: 6.5px;
-            margin-bottom: 8px;
+            font-size: 6px;
+            margin-bottom: 6px;
             table-layout: fixed;
         }
         .register-table th,
         .register-table td {
             border: 1px solid black;
-            padding: 2px 3px;
+            padding: 1px 2px;
             text-align: center;
             vertical-align: middle;
             word-wrap: break-word;
@@ -69,14 +74,13 @@
             font-weight: bold;
             background: #fff;
             line-height: 1.2;
-            vertical-align: middle;
         }
-        .register-table td { height: 18px; }
+        .register-table td { height: 16px; }
 
         /* Column widths — total = 100% */
         .c1  { width: 3%;  }
         .c2  { width: 5%;  }
-        .c3  { width: 15%; }
+        .c3  { width: 14%; }
         .c4  { width: 3%;  }
         .c5  { width: 4%;  }
         .c6  { width: 7%;  }
@@ -85,30 +89,35 @@
         .c9  { width: 7%;  }
         .c10 { width: 7%;  }
         .c11 { width: 7%;  }
-        .c12 { width: 7%;  }
+        .c12 { width: 8%;  }
         .c13 { width: 7%;  }
         .c14 { width: 7%;  }
-        .c15 { width: 6%;  }
+        .c15 { width: 7%;  }
 
-        /* Name cell — single line */
-        .td-name { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .td-left { text-align: left; }
+        .td-name   { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .td-left   { text-align: left; }
         .td-nowrap { white-space: nowrap; }
 
         /* ── Notes ── */
-        .notes-section { margin-top: 8px; font-size: 7.5px; line-height: 1.5; }
+        .notes-section { margin-top: 6px; font-size: 7px; line-height: 1.4; }
+
+        @media print {
+            body { padding: 0; }
+            .page-wrap { width: 100%; }
+        }
     </style>
 </head>
 <body>
+<div class="page-wrap">
 <div class="form-container">
 
     <!-- Header -->
     <div class="form-header">
-        <div class="red-bold">The Tamil Nadu Factories Rules</div>
+        <div>The Tamil Nadu Factories Rules</div>
         <div class="black-bold">FORM 17</div>
         <div>(Prescribed under Rule 14)</div>
         <div class="black-bold">Health Register</div>
-        <div style="font-size:8px;">(In respect of persons employed in occupations declared to be dangerous operations under section 87)</div>
+        <div style="font-size:7.5px;">(In respect of persons employed in occupations declared to be dangerous operations under section 87)</div>
     </div>
 
     <!-- Certifying Surgeon -->
@@ -173,7 +182,7 @@
         </thead>
         <tbody>
             @if($is_nil)
-                <tr><td colspan="15" style="text-align:center;font-weight:bold;padding:10px;">NIL</td></tr>
+                <tr><td colspan="15" style="text-align:center;font-weight:bold;padding:8px;">NIL</td></tr>
             @else
                 @foreach($rows as $row)
                 <tr>
@@ -211,6 +220,7 @@
         (ii) Column (11) – Should be expressed as fit/unfit/suspended
     </div>
 
+</div>
 </div>
 </body>
 </html>

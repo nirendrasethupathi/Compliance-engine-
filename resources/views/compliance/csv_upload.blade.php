@@ -2,9 +2,83 @@
 
 @section('title', 'Upload Compliance Data')
 
+@push('styles')
+<style>
+/* ── Upload cards ─────────────────────────────────────────────────────────── */
+.upload-card {
+    border: 2px dashed #d9d9d9;
+    border-radius: 8px;
+    background: #fff;
+    transition: border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.upload-card.ready { border-color: #52c41a; }
+
+.upload-card-head {
+    background: #8c8c8c;
+    color: #fff;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.upload-card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.sample-download-box {
+    margin-top: 14px !important;
+    padding: 12px !important;
+    background: #e6fffb !important;
+    border: 1px solid #87e8de !important;
+    border-radius: 8px !important;
+    display: block !important;
+    width: 100% !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    position: relative !important;
+    z-index: 999 !important;
+    box-sizing: border-box !important;
+}
+.sample-title {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #08979c !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+.sample-download-btn {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    padding: 8px 12px !important;
+    background: #13c2c2 !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    box-sizing: border-box !important;
+}
+.sample-download-btn:hover {
+    background: #08979c !important;
+    color: #fff !important;
+    text-decoration: none !important;
+}
+
+/* ── File status tag ──────────────────────────────────────────────────────── */
+.file-status { min-height: 24px; margin-top: 8px; }
+</style>
+@endpush
+
 @section('content')
 
-{{-- Flash errors from server-side redirect (non-AJAX fallback) --}}
 @if ($errors->any())
 <div class="ant-alert ant-alert-error mb-3">
     <strong>Upload failed:</strong>
@@ -17,16 +91,15 @@
 @endif
 
 <div class="ant-card">
-    <div class="ant-card-head">📂 Upload Compliance Datasets</div>
+    <div class="ant-card-head">📂 CSV Upload — All 3 Datasets</div>
     <div class="ant-card-body">
 
-        {{-- Result banner (shown after AJAX response) --}}
         <div id="uploadResult" class="ant-alert mb-3" style="display:none;"></div>
 
         <form id="csvUploadForm" enctype="multipart/form-data">
             @csrf
 
-            {{-- Period --}}
+            {{-- Period row --}}
             <div class="ant-row mb-3">
                 <div class="ant-col ant-col-6">
                     <div class="ant-form-item">
@@ -42,110 +115,113 @@
                 </div>
             </div>
 
-            {{-- File inputs --}}
+            {{-- ── Three upload cards ──────────────────────────────────────── --}}
             <div class="ant-row mb-3">
 
-                {{-- Employees --}}
+                {{-- EMPLOYEES ------------------------------------------------ --}}
                 <div class="ant-col ant-col-4">
-                    <div class="ant-card" style="border:2px dashed #d9d9d9;" id="card-employees">
-                        <div class="ant-card-head secondary">👥 Employees CSV</div>
-                        <div class="ant-card-body">
-                            <div class="ant-form-item">
-                                <label class="ant-form-item-label">
+                    <div class="upload-card" id="card-employees">
+                        <div class="upload-card-head">👥 Employees CSV</div>
+                        <div class="upload-card-body">
+
+                            {{-- File picker --}}
+                            <div class="ant-form-item" style="margin-bottom:10px;">
+                                <label class="ant-form-item-label" style="font-size:13px;">
                                     employees.csv <span style="color:#ff4d4f">*</span>
                                 </label>
                                 <input type="file" name="employees_file" accept=".csv,.txt"
                                        class="csv-input" data-card="card-employees" required
-                                       style="width:100%;padding:6px 0;">
+                                       style="width:100%;padding:4px 0;font-size:13px;">
                             </div>
-                            <div class="text-muted" style="font-size:12px;line-height:1.6;">
-                                Required columns:<br>
-                                <code>employee_code, name</code><br>
-                                Optional:<br>
-                                <code>designation, department, uan, esi,<br>basic_salary, date_of_joining</code>
+
+                            {{-- Required columns hint --}}
+                            <div style="font-size:11px;color:#8c8c8c;line-height:1.7;margin-bottom:4px;">
+                                <strong style="color:#595959;">Required:</strong>
+                                <code style="font-size:11px;">employee_code, name</code><br>
+                                <strong style="color:#595959;">Optional:</strong>
+                                <code style="font-size:11px;">designation, department, uan, basic_salary, date_of_joining</code>
                             </div>
-                            <div class="file-status mt-3" id="status-employees"></div>
+
+                            <div class="sample-download-box">
+                                <span class="sample-title">📥 Sample CSV Format</span>
+                                <a href="/compliance/csv-template/employees"
+                                   class="sample-download-btn" download>⬇ Download Template</a>
+                            </div>
+
+                            <div class="file-status" id="status-employees"></div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Payroll --}}
+                {{-- PAYROLL -------------------------------------------------- --}}
                 <div class="ant-col ant-col-4">
-                    <div class="ant-card" style="border:2px dashed #d9d9d9;" id="card-payroll">
-                        <div class="ant-card-head secondary">💰 Payroll CSV</div>
-                        <div class="ant-card-body">
-                            <div class="ant-form-item">
-                                <label class="ant-form-item-label">
+                    <div class="upload-card" id="card-payroll">
+                        <div class="upload-card-head">💰 Payroll CSV</div>
+                        <div class="upload-card-body">
+
+                            <div class="ant-form-item" style="margin-bottom:10px;">
+                                <label class="ant-form-item-label" style="font-size:13px;">
                                     payroll.csv <span style="color:#ff4d4f">*</span>
                                 </label>
                                 <input type="file" name="payroll_file" accept=".csv,.txt"
                                        class="csv-input" data-card="card-payroll" required
-                                       style="width:100%;padding:6px 0;">
+                                       style="width:100%;padding:4px 0;font-size:13px;">
                             </div>
-                            <div class="text-muted" style="font-size:12px;line-height:1.6;">
-                                Required columns:<br>
-                                <code>employee_code, gross_salary, net_salary</code><br>
-                                Optional:<br>
-                                <code>basic_salary, da, hra, pf_employee,<br>esi_employee, professional_tax,<br>working_days, payment_date</code>
+
+                            <div style="font-size:11px;color:#8c8c8c;line-height:1.7;margin-bottom:4px;">
+                                <strong style="color:#595959;">Required:</strong>
+                                <code style="font-size:11px;">employee_code, gross_salary, net_salary</code><br>
+                                <strong style="color:#595959;">Optional:</strong>
+                                <code style="font-size:11px;">basic_salary, hra, pf, esi, professional_tax, salary_month</code>
                             </div>
-                            <div class="file-status mt-3" id="status-payroll"></div>
+
+                            <div class="sample-download-box">
+                                <span class="sample-title">📥 Sample CSV Format</span>
+                                <a href="/compliance/csv-template/payroll"
+                                   class="sample-download-btn" download>⬇ Download Template</a>
+                            </div>
+
+                            <div class="file-status" id="status-payroll"></div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Attendance --}}
+                {{-- ATTENDANCE ----------------------------------------------- --}}
                 <div class="ant-col ant-col-4">
-                    <div class="ant-card" style="border:2px dashed #d9d9d9;" id="card-attendance">
-                        <div class="ant-card-head secondary">📅 Attendance CSV</div>
-                        <div class="ant-card-body">
-                            <div class="ant-form-item">
-                                <label class="ant-form-item-label">
+                    <div class="upload-card" id="card-attendance">
+                        <div class="upload-card-head">📅 Attendance CSV</div>
+                        <div class="upload-card-body">
+
+                            <div class="ant-form-item" style="margin-bottom:10px;">
+                                <label class="ant-form-item-label" style="font-size:13px;">
                                     attendance.csv <span style="color:#ff4d4f">*</span>
                                 </label>
                                 <input type="file" name="attendance_file" accept=".csv,.txt"
                                        class="csv-input" data-card="card-attendance" required
-                                       style="width:100%;padding:6px 0;">
+                                       style="width:100%;padding:4px 0;font-size:13px;">
                             </div>
-                            <div class="text-muted" style="font-size:12px;line-height:1.6;">
-                                Required columns:<br>
-                                <code>employee_code, working_days</code><br>
-                                Optional:<br>
-                                <code>absent, attendance_date, status</code>
+
+                            <div style="font-size:11px;color:#8c8c8c;line-height:1.7;margin-bottom:4px;">
+                                <strong style="color:#595959;">Required:</strong>
+                                <code style="font-size:11px;">employee_code, working_days</code><br>
+                                <strong style="color:#595959;">Optional:</strong>
+                                <code style="font-size:11px;">present_days, absent_days, weekly_off, paid_leave, ot_hours</code>
                             </div>
-                            <div class="file-status mt-3" id="status-attendance"></div>
+
+                            <div class="sample-download-box">
+                                <span class="sample-title">📥 Sample CSV Format</span>
+                                <a href="/compliance/csv-template/attendance"
+                                   class="sample-download-btn" download>⬇ Download Template</a>
+                            </div>
+
+                            <div class="file-status" id="status-attendance"></div>
                         </div>
                     </div>
                 </div>
 
             </div>{{-- /ant-row --}}
 
-            {{-- CSV format reference --}}
-            <div class="ant-card mb-3" style="background:#fafafa;">
-                <div class="ant-card-head info">📋 Sample CSV Formats</div>
-                <div class="ant-card-body">
-                    <div class="ant-row">
-                        <div class="ant-col ant-col-4">
-                            <strong style="font-size:13px;">employees.csv</strong>
-                            <pre style="font-size:11px;margin-top:6px;background:#fff;padding:8px;border-radius:4px;border:1px solid #f0f0f0;">employee_code,name,designation,uan,esi
-MAK001,ARUMUGAM S,Supervisor,UAN001,ESI001
-MAK002,BALAMURUGAN K,Technician,UAN002,ESI002</pre>
-                        </div>
-                        <div class="ant-col ant-col-4">
-                            <strong style="font-size:13px;">payroll.csv</strong>
-                            <pre style="font-size:11px;margin-top:6px;background:#fff;padding:8px;border-radius:4px;border:1px solid #f0f0f0;">employee_code,gross_salary,net_salary,pf_employee,esi_employee,professional_tax
-MAK001,10308,9371,660,96,181
-MAK002,10308,9371,660,96,181</pre>
-                        </div>
-                        <div class="ant-col ant-col-4">
-                            <strong style="font-size:13px;">attendance.csv</strong>
-                            <pre style="font-size:11px;margin-top:6px;background:#fff;padding:8px;border-radius:4px;border:1px solid #f0f0f0;">employee_code,working_days,absent
-MAK001,27,0
-MAK002,27,0</pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            {{-- ── Submit row ─────────────────────────────────────────────── --}}
             <div class="d-flex gap-2 align-items-center">
                 <button type="submit" class="ant-btn ant-btn-primary" id="submitBtn">
                     ⬆️ Upload All Datasets
@@ -167,19 +243,19 @@ MAK002,27,0</pre>
 // ── File picker feedback ──────────────────────────────────────────────────────
 document.querySelectorAll('.csv-input').forEach(function (input) {
     input.addEventListener('change', function () {
-        const cardId  = this.dataset.card;
-        const type    = cardId.replace('card-', '');
+        const cardId   = this.dataset.card;
+        const type     = cardId.replace('card-', '');
         const statusEl = document.getElementById('status-' + type);
-        const card    = document.getElementById(cardId);
+        const card     = document.getElementById(cardId);
 
         if (this.files.length) {
             const file = this.files[0];
             const kb   = (file.size / 1024).toFixed(1);
             statusEl.innerHTML = `<span class="ant-tag ant-tag-success">✓ ${file.name} (${kb} KB)</span>`;
-            card.style.borderColor = '#52c41a';
+            card.classList.add('ready');
         } else {
             statusEl.innerHTML = '';
-            card.style.borderColor = '#d9d9d9';
+            card.classList.remove('ready');
         }
     });
 });
@@ -192,26 +268,24 @@ document.getElementById('csvUploadForm').addEventListener('submit', async functi
     const spinner = document.getElementById('uploadSpinner');
     const result  = document.getElementById('uploadResult');
 
-    btn.disabled    = true;
+    btn.disabled          = true;
     spinner.style.display = 'inline-flex';
     result.style.display  = 'none';
 
     try {
         const resp = await fetch('{{ route("data.upload-multi") }}', {
-            method: 'POST',
+            method : 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json',
+                'Accept'      : 'application/json',
             },
             body: new FormData(this),
         });
 
         let json;
         const rawText = await resp.text();
-        try {
-            json = JSON.parse(rawText);
-        } catch (_) {
-            // Server returned HTML (e.g. session expired or unexpected error)
+        try   { json = JSON.parse(rawText); }
+        catch (_) {
             result.className = 'ant-alert ant-alert-error mb-3';
             result.innerHTML = `<strong>❌ Server error (${resp.status}):</strong> Unexpected response. Check server logs.`;
             return;
@@ -229,13 +303,11 @@ document.getElementById('csvUploadForm').addEventListener('submit', async functi
                 </small>`;
             this.reset();
             document.querySelectorAll('.file-status').forEach(el => el.innerHTML = '');
-            document.querySelectorAll('[id^="card-"]').forEach(el => el.style.borderColor = '#d9d9d9');
+            document.querySelectorAll('.upload-card').forEach(el => el.classList.remove('ready'));
         } else {
-            // Surface Laravel validation errors (errors object) or plain message
             let msg = json.message ?? 'Upload failed.';
             if (json.errors) {
-                const lines = Object.values(json.errors).flat();
-                msg = lines.join('<br>');
+                msg = Object.values(json.errors).flat().join('<br>');
             }
             result.className = 'ant-alert ant-alert-error mb-3';
             result.innerHTML = `<strong>❌ Upload failed:</strong><br>${msg}`;

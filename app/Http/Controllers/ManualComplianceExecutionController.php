@@ -124,15 +124,30 @@ class ManualComplianceExecutionController extends Controller
     {
         $user = auth()->user();
 
-        return ComplianceExecutionBatch::where('id', $batchId)
+
+        $batch = ComplianceExecutionBatch::where('id', $batchId)
             ->where('tenant_id', $user->tenant_id)
             ->where('branch_id', $user->branch_id)
-            ->firstOrFail();
+            ->first();
+
+        if (! $batch) {
+            // Important: for JSON endpoints return JSON. For non-JSON, keep default HTML.
+            $request = request();
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Batch not found.'], 404);
+            }
+
+            abort(404, 'Batch not found.');
+        }
+
+
+        return $batch;
     }
 
     private function findItemForCurrentUser(int $itemId): ManualComplianceBatchItem
     {
         $user = auth()->user();
+
 
         Log::debug('ManualCompliance: findItemForCurrentUser', [
             'item_id'   => $itemId,
@@ -149,8 +164,10 @@ class ManualComplianceExecutionController extends Controller
 
         if (! $item) {
             $raw = ManualComplianceBatchItem::find($itemId);
+
             Log::error('ManualCompliance: item not found for user scope', [
                 'item_id'        => $itemId,
+
                 'user_tenant_id' => $user->tenant_id,
                 'user_branch_id' => $user->branch_id,
                 'item_tenant_id' => $raw?->tenant_id,

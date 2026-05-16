@@ -6,110 +6,97 @@
     <meta charset="UTF-8">
     <title>FORM B - Register of Fines</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', Times, serif;
-            padding: 12px;
-            font-size: 9px;
+            font-size: 8px;
+            background: #fff;
+            padding: 8px;
+        }
+        .page-wrap {
+            width: 740px;
+            margin: 0 auto;
         }
         .form-container {
-            border: 1px solid black;
-            padding: 10px;
-            margin: 0 auto;
-            width: 99%;
+            border: 1.5px solid black;
+            padding: 8px 10px;
+            width: 100%;
         }
         .form-header {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 10px;
-        }
-        .form-header div {
-            margin: 2px 0;
+            margin-bottom: 7px;
+            font-size: 9px;
+            line-height: 1.4;
         }
         .header-title {
             font-weight: bold;
         }
         .establishment-field {
-            margin-bottom: 8px;
-            font-size: 9px;
+            margin-bottom: 6px;
+            font-size: 8px;
             display: flex;
             align-items: center;
+            gap: 4px;
         }
         .establishment-label {
             font-weight: bold;
-            margin-right: 5px;
+            white-space: nowrap;
         }
-        .establishment-line {
+        .establishment-value {
             flex: 1;
             border-bottom: 1px solid black;
-            height: 10px;
+            min-height: 12px;
             padding-left: 3px;
+            font-size: 8px;
         }
         .register-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8px;
-            margin-bottom: 10px;
+            font-size: 7px;
             table-layout: fixed;
         }
         .register-table th,
         .register-table td {
             border: 1px solid black;
-            padding: 3px;
+            padding: 2px 3px;
             text-align: center;
             vertical-align: middle;
-            height: 16px;
             word-wrap: break-word;
             word-break: break-word;
+            line-height: 1.2;
         }
         .register-table th {
             font-weight: bold;
             background-color: #fff;
-            line-height: 1.1;
         }
         .register-table td {
             text-align: left;
+            height: 18px;
         }
-        .col-sl {
-            width: 5%;
-        }
-        .col-name {
-            width: 12%;
-        }
-        .col-father {
-            width: 14%;
-        }
-        .col-act {
-            width: 14%;
-        }
-        .col-cause {
-            width: 16%;
-        }
-        .col-wages {
-            width: 10%;
-        }
-        .col-amount {
-            width: 10%;
-        }
-        .col-date {
-            width: 7%;
-        }
-        .col-sign {
-            width: 6%;
-        }
-        .col-remarks {
-            width: 6%;
-        }
-        .text-center {
-            text-align: center;
+        .text-center { text-align: center !important; }
+
+        /* Column widths — total = 100% */
+        .col-sl     { width: 5%; }
+        .col-name   { width: 11%; }
+        .col-father { width: 13%; }
+        .col-act    { width: 14%; }
+        .col-cause  { width: 17%; }
+        .col-wages  { width: 10%; }
+        .col-amount { width: 10%; }
+        .col-date   { width: 8%; }
+        .col-sign   { width: 7%; }
+        .col-remarks{ width: 5%; }
+
+        @media print {
+            body { padding: 0; }
+            .page-wrap { width: 100%; }
         }
     </style>
 </head>
 <body>
+<div class="page-wrap">
     <div class="form-container">
+
         <!-- Header -->
         <div class="form-header">
             <div>Tamil Nadu Shops And Establishments Rules</div>
@@ -120,8 +107,8 @@
 
         <!-- Establishment Field -->
         <div class="establishment-field">
-            <div class="establishment-label">Establishment</div>
-            <div class="establishment-line"></div>
+            <span class="establishment-label">Establishment:</span>
+            <span class="establishment-value">{{ $establishment ?? '' }}</span>
         </div>
 
         <!-- Fines Register Table -->
@@ -140,16 +127,16 @@
                     <th class="col-remarks">Remarks</th>
                 </tr>
                 <tr>
-                    <th class="col-sl text-center">(1)</th>
-                    <th class="col-name text-center">(2)</th>
-                    <th class="col-father text-center">(3)</th>
-                    <th class="col-act text-center">(4)</th>
-                    <th class="col-cause text-center">(5)</th>
-                    <th class="col-wages text-center">(6)</th>
-                    <th class="col-amount text-center">(7)</th>
-                    <th class="col-date text-center">(8)</th>
-                    <th class="col-sign text-center">(9)</th>
-                    <th class="col-remarks text-center">(10)</th>
+                    <th class="col-sl">(1)</th>
+                    <th class="col-name">(2)</th>
+                    <th class="col-father">(3)</th>
+                    <th class="col-act">(4)</th>
+                    <th class="col-cause">(5)</th>
+                    <th class="col-wages">(6)</th>
+                    <th class="col-amount">(7)</th>
+                    <th class="col-date">(8)</th>
+                    <th class="col-sign">(9)</th>
+                    <th class="col-remarks">(10)</th>
                 </tr>
             </thead>
             <tbody>
@@ -175,6 +162,8 @@
                 @endif
             </tbody>
         </table>
+
     </div>
+</div>
 </body>
 </html>

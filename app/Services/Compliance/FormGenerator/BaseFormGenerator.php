@@ -57,11 +57,10 @@ abstract class BaseFormGenerator
     public function generatePdf(array $formData): string
     {
         try {
-            // Read orientation from per-form config file (e.g. config/pdf_form_10.php).
-            // Falls back to 'portrait' so all other forms are unaffected.
-            $formKey   = strtolower(str_replace('_', '', $this->formCode)); // FORM_10 → form10
+            $formKey   = strtolower(str_replace('_', '', $this->formCode));
             $pdfConfig = config("pdf_{$formKey}.{$this->formCode}", []);
-            $orientation = $pdfConfig['orientation'] ?? 'portrait';
+            $landscapeForms = ['FORM_2', 'FORM_10', 'FORM_11', 'FORM_12', 'FORM_17', 'FORM_18', 'FORM_25', 'ESI_FORM_11'];
+            $orientation = $pdfConfig['orientation'] ?? (in_array($this->formCode, $landscapeForms) ? 'landscape' : 'portrait');
             $paper       = $pdfConfig['paper']       ?? 'A4';
 
             $pdf = Pdf::loadView($this->view, $formData)

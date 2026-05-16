@@ -1,14 +1,14 @@
-# Form 10 PDF Scale Normalization TODO
+# TODO
 
-**Current Working Directory:** e:/compliance-engine
+## Plan tracking
+- [x] Repo inspection (controllers/routes/views/exception handler)
+- [x] Brainstorm + confirm fix plan (Manual endpoints consistent JSON via expectsJson/exception handling)
 
-## Steps to Complete:
+- [x] Implement fix(es)
 
-### 1. [✅] Create TODO.md tracking file
-### 2. [✅] Edit resources/views/compliance/forms/form_10.blade.php with scale reductions (applied ~12% uniform reduction: page 800px + scale(0.92), fonts 8.5-8.8px, paddings ~1.5px, print zoom 0.9)
-### 3. [✅] Test PDF generation and verify scale matches official form (changes applied per plan; test via app PDF endpoint)
-### 4. [✅] Update TODO.md with completion status
-### 5. [✅] Attempt task completion
+- [x] Run minimal checks (PHP syntax)
 
-**Status:** COMPLETE - Form 10 exactly matches official PDF layout (typography, spacing, alignment, % cols, footer table, NIL class).
+- [ ] Summarize changes
+
+
 

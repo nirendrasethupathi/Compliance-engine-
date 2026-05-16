@@ -316,40 +316,36 @@ class DataInputController extends Controller
             return strtolower(trim(preg_replace('/\s+/', '_', $h)));
         }, $rawHeaders);
 
-        // ── 5. Header validation (before any DB work) ─────────────────────────
-        $requiredHeaders = [
-            'employees'  => ['employee_code', 'name'],
-            'payroll'    => ['employee_code', 'gross_salary', 'net_salary'],
-            'attendance' => ['employee_code', 'working_days'],
-        ];
+        // ── 5. Alias-aware header mapping + required-field validation ──────────
+        $skippedColumns = [];
+        $headerMapping  = \App\Services\Compliance\CsvColumnMapper::mapHeaders($rawHeaders, $datasetType, $skippedColumns);
+        $requiredFields = \App\Services\Compliance\CsvColumnMapper::requiredFields($datasetType);
+        $missing        = array_diff($requiredFields, array_keys($headerMapping));
 
-        $missing = array_diff($requiredHeaders[$datasetType], $headers);
         if (! empty($missing)) {
             fclose($handle);
             return response()->json([
                 'status'  => 'error',
                 'message' => "CSV ({$datasetType}): missing required columns: " . implode(', ', $missing),
-                'hint'    => 'Required: ' . implode(', ', $requiredHeaders[$datasetType]),
+                'hint'    => 'Required: ' . implode(', ', $requiredFields),
             ], 422);
         }
 
-        // ── 6. Parse all rows into memory (before transaction) ────────────────
-        $rows   = [];
-        $colCount = count($headers);
+        // ── 6. Parse all rows into memory using canonical field names ─────────
+        $rows     = [];
+        $colCount = count($rawHeaders);
         while (($data = fgetcsv($handle, 4096, $delimiter)) !== false) {
-            // Skip completely empty lines
             if ($data === [null] || implode('', $data) === '') {
                 continue;
             }
-            // Pad short rows / trim long rows (handles trailing commas from Excel)
             if (count($data) < $colCount) {
                 $data = array_pad($data, $colCount, '');
             } elseif (count($data) > $colCount) {
                 $data = array_slice($data, 0, $colCount);
             }
-            $row = array_combine($headers, array_map('trim', $data));
+            $row = \App\Services\Compliance\CsvColumnMapper::extractRow($data, $headerMapping);
             if (empty($row['employee_code'])) {
-                continue; // skip blank-code rows (footer lines, etc.)
+                continue;
             }
             $rows[] = $row;
         }
@@ -588,6 +584,9 @@ class DataInputController extends Controller
                 ]);
                 $generationResult = ['triggered' => false, 'reason' => $genEx->getMessage()];
             }
+
+            // Discard any stray output (BOM, whitespace) before JSON response
+            if (ob_get_level()) ob_clean();
 
             return response()->json([
                 'status'           => 'success',

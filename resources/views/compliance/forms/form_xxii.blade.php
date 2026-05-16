@@ -77,13 +77,13 @@
             font-size: 8px; height: 18px; vertical-align: middle;
         }
         .td-sl   { text-align: center; }
-        .td-name { text-align: left; font-size: 7px !important; padding: 2px 0px !important; white-space: nowrap; }
+        .td-name { text-align: left; font-size: 6.5px !important; padding: 2px 1px !important; white-space: nowrap; overflow: hidden; }
         .td-left { text-align: left; font-size: 7px; padding: 2px 1px; white-space: nowrap; }
         .td-ctr  { text-align: center; font-size: 8px; }
         .nil-row td { text-align: center; font-weight: bold; font-size: 9px; height: 20px; }
         .tfoot-note { text-align: left; font-style: italic; padding: 4px 6px; border: 1px solid #000; font-size: 8px; vertical-align: middle; }
         .tfoot-nil  { text-align: center; font-weight: bold; padding: 4px 6px; border: 1px solid #000; font-size: 8px; vertical-align: middle; }
-        .tfoot-sig  { text-align: right; padding: 4px 6px; border: 1px solid #000; font-size: 8px; vertical-align: bottom; height: 60px; }
+        .tfoot-sig  { text-align: right; padding: 4px 6px 2px 6px; border: 1px solid #000; font-size: 8px; vertical-align: bottom; height: 100px; }
         .sig-label  { font-size: 8px; font-weight: bold; color: #000; text-align: right; display: block; }
     </style>
 </head>
@@ -137,16 +137,16 @@
     <table class="reg-table">
         <colgroup>
             <col style="width: 4%;">
-            <col style="width: 18%;">
+            <col style="width: 22%;">
             <col style="width: 10%;">
-            <col style="width: 11%;">
+            <col style="width: 10%;">
+            <col style="width: 7%;">
+            <col style="width: 7%;">
             <col style="width: 8%;">
             <col style="width: 8%;">
-            <col style="width: 9%;">
-            <col style="width: 9%;">
             <col style="width: 8%;">
             <col style="width: 13%;">
-            <col style="width: 2%;">
+            <col style="width: 3%;">
         </colgroup>
         <thead>
             <tr class="num-row">
@@ -172,15 +172,15 @@
                 @foreach($rows as $i => $row)
                 <tr>
                     <td class="td-sl">{{ $i + 1 }}</td>
-                    <td class="td-name">{{ strtoupper($row['name'] ?? 'NIL') }}</td>
-                    <td class="td-left">{{ strtoupper($row['father_name'] ?? 'NIL') }}</td>
-                    <td class="td-left">{{ strtoupper($row['designation'] ?? 'NIL') }}</td>
-                    <td class="td-ctr">{{ $row['advance_date_amount_1'] ?? 'NIL' }}</td>
-                    <td class="td-ctr">{{ $row['advance_date_amount_2'] ?? 'NIL' }}</td>
-                    <td class="td-ctr">{{ $row['purpose'] ?? 'NIL' }}</td>
-                    <td class="td-ctr">{{ $row['installments'] ?? 'NIL' }}</td>
-                    <td class="td-ctr">{{ $row['installment_repaid'] ?? 'NIL' }}</td>
-                    <td class="td-ctr">{{ $row['last_installment_date'] ?? 'NIL' }}</td>
+                    <td class="td-name">{{ strtoupper($row['name'] ?? '') }}</td>
+                    <td class="td-left">{{ ($v = strtoupper($row['father_name'] ?? '')) === 'NIL' ? '' : $v }}</td>
+                    <td class="td-left">{{ ($v = strtoupper($row['designation'] ?? '')) === 'NIL' ? '' : $v }}</td>
+                    <td class="td-ctr">{{ ($v = $row['advance_date_amount_1'] ?? '') === 'NIL' ? '' : $v }}</td>
+                    <td class="td-ctr">{{ ($v = $row['advance_date_amount_2'] ?? '') === 'NIL' ? '' : $v }}</td>
+                    <td class="td-ctr">{{ ($v = $row['purpose'] ?? '') === 'NIL' ? '' : $v }}</td>
+                    <td class="td-ctr">{{ ($v = $row['installments'] ?? '') === 'NIL' ? '' : $v }}</td>
+                    <td class="td-ctr">{{ ($v = $row['installment_repaid'] ?? '') === 'NIL' ? '' : $v }}</td>
+                    <td class="td-ctr">{{ ($v = $row['last_installment_date'] ?? '') === 'NIL' ? '' : $v }}</td>
                     <td class="td-ctr"></td>
                 </tr>
                 @endforeach
@@ -199,18 +199,15 @@
                     @endif
                 </td>
             </tr>
-            <tr>
-                <td colspan="11" class="tfoot-sig">
-                    @if(isset($company_signature) && $company_signature)
-                        <img src="{{ storage_path('app/' . $company_signature) }}" style="width:45px;height:45px;object-fit:contain;" alt="Seal">
-                    @endif
-                    <span class="sig-label">Seal Signature of The Contractor</span>
-                </td>
-            </tr>
         </tfoot>
     </table>
 
-    {{-- FOOTER (inside reg-table as tfoot) --}}
+    <div style="text-align: right; padding: 100px 6px 8px 6px; font-size: 8px; font-weight: bold; border-top: 1px solid #000;">
+        @if(isset($company_signature) && $company_signature)
+            <img src="{{ storage_path('app/' . $company_signature) }}" style="width:45px;height:45px;object-fit:contain;" alt="Seal"><br>
+        @endif
+        Seal Signature of The Contractor
+    </div>
 
 </div>
 </body>

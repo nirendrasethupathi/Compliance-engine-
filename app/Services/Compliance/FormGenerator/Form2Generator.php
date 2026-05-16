@@ -2,11 +2,30 @@
 
 namespace App\Services\Compliance\FormGenerator;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
+
 class Form2Generator extends BaseFormGenerator
 {
     protected string $formCode = 'FORM_2';
     protected string $view = 'compliance.forms.form_2';
 
+    public function generatePdf(array $formData): string
+    {
+        try {
+            $pdf = Pdf::loadView($this->view, $formData)
+                ->setPaper('A4', 'landscape')
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isRemoteEnabled', false)
+                ->setOption('dpi', 96)
+                ->setOption('defaultFont', 'Arial')
+                ->setOption('chroot', [public_path()]);
+            return $pdf->output();
+        } catch (\Exception $e) {
+            Log::error('Form2 PDF generation failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
     protected function prepareData(array $rawData): array
     {
         $rows = [];

@@ -1,31 +1,31 @@
-@extends('compliance.layouts.preview')
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>ESI FORM 12 - Accident Report</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @page { size: A4 portrait; margin: 6mm; }
+
         body {
             font-family: 'Times New Roman', Times, serif;
-            padding: 12px;
-            font-size: 9px;
+            font-size: 7.5px;
+            margin: 0;
+            padding: 6px;
+            background: #fff;
+            color: #000;
         }
         .form-container {
-            border: 1px solid black;
-            padding: 10px;
-            margin: 0 auto;
-            width: 99%;
-            page-break-after: always;
+            border: 2px solid #000;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 6px;
         }
         .form-header {
             display: table;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 4px;
             border: 1px solid black;
         }
         .header-cell {
@@ -42,43 +42,43 @@
         }
         .section-title {
             font-weight: bold;
-            font-size: 10px;
-            margin-top: 8px;
-            margin-bottom: 4px;
-            border-bottom: 1px solid black;
-            padding: 2px;
+            font-size: 8px;
+            margin-top: 3px;
+            margin-bottom: 2px;
+            border-bottom: 1px solid #000;
+            padding: 1px 2px;
         }
         .field-row {
             display: table;
             width: 100%;
-            margin-bottom: 4px;
-            border: 1px solid black;
+            margin-bottom: 2px;
+            border: 1px solid #000;
         }
         .field-label {
             display: table-cell;
             width: 35%;
-            padding: 3px 4px;
+            padding: 2px 3px;
             font-weight: bold;
-            border-right: 1px solid black;
+            border-right: 1px solid #000;
             vertical-align: top;
         }
         .field-value {
             display: table-cell;
             width: 65%;
-            padding: 3px 4px;
+            padding: 2px 3px;
             vertical-align: top;
-            min-height: 18px;
+            min-height: 14px;
         }
         .two-column-row {
             display: table;
             width: 100%;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .two-column-cell {
             display: table-cell;
             width: 50%;
-            border: 1px solid black;
-            padding: 3px 4px;
+            border: 1px solid #000;
+            padding: 2px 3px;
         }
         .two-column-cell:first-child {
             border-right: 1px solid black;
@@ -103,56 +103,47 @@
         .witness-row {
             display: table;
             width: 100%;
-            margin-bottom: 4px;
-            border: 1px solid black;
+            margin-bottom: 2px;
+            border: 1px solid #000;
         }
         .witness-label {
             display: table-cell;
             width: 5%;
-            padding: 3px 4px;
-            border-right: 1px solid black;
+            padding: 2px 3px;
+            border-right: 1px solid #000;
             font-weight: bold;
             vertical-align: top;
         }
         .witness-value {
             display: table-cell;
             width: 95%;
-            padding: 3px 4px;
+            padding: 2px 3px;
             vertical-align: top;
-            min-height: 30px;
+            min-height: 20px;
         }
         .declaration-section {
-            border: 1px solid black;
-            padding: 6px;
-            margin-bottom: 4px;
-            font-size: 9px;
-            line-height: 1.4;
+            border: 1px solid #000;
+            padding: 4px;
+            margin-bottom: 2px;
+            font-size: 7.5px;
+            line-height: 1.3;
         }
         .footer-row {
             display: table;
             width: 100%;
-            margin-bottom: 4px;
-            border: 1px solid black;
+            margin-bottom: 2px;
+            border: 1px solid #000;
         }
         .footer-cell {
             display: table-cell;
             width: 50%;
-            padding: 3px 4px;
-            border-right: 1px solid black;
+            padding: 2px 3px;
+            border-right: 1px solid #000;
             vertical-align: top;
-            min-height: 40px;
+            min-height: 30px;
         }
-        .footer-cell:last-child {
-            border-right: none;
-        }
-        .footer-label {
-            font-weight: bold;
-            font-size: 9px;
-        }
-        .page-break {
-            page-break-after: always;
-            margin-top: 10px;
-        }
+        .footer-cell:last-child { border-right: none; }
+        .footer-label { font-weight: bold; font-size: 8px; }
     </style>
 </head>
 <body>

@@ -25,7 +25,7 @@
         .form-table td {
             border: 1px solid #000;
             padding: 2px 1px;
-            font-size: 7px;
+            font-size: 6.5px;
             text-align: center;
             vertical-align: middle;
             overflow: hidden;
@@ -33,6 +33,13 @@
         .form-table th { font-weight: bold; white-space: normal; word-break: break-word; line-height: 1.1; height: 40px; }
         .form-table td.left  { text-align: left; padding-left: 3px; }
         .form-table td.right { text-align: right; }
+        .form-table td.name-cell {
+            text-align: left;
+            padding-left: 3px;
+            white-space: nowrap;
+            overflow: visible;
+            font-size: 4.5px;
+        }
 
         .form-table tr.col-nums th { height: auto; font-size: 7px; padding: 1px 0; }
         .form-table tr.nil-row td  { text-align: center; font-weight: bold; padding: 6px 0; font-size: 8px; }
@@ -68,18 +75,18 @@
 
     <table class="form-table">
         <colgroup>
+            <col style="width:4%">
+            <col style="width:17%">
+            <col style="width:11%">
+            <col style="width:9%">
+            <col style="width:9%">
+            <col style="width:7%">
+            <col style="width:9%">
+            <col style="width:11%">
+            <col style="width:7%">
             <col style="width:5%">
-            <col style="width:12%">
-            <col style="width:12%">
-            <col style="width:10%">
-            <col style="width:10%">
-            <col style="width:8%">
-            <col style="width:10%">
-            <col style="width:12%">
-            <col style="width:8%">
             <col style="width:6%">
-            <col style="width:8%">
-            <col style="width:8%">
+            <col style="width:6%">
             <col style="width:5%">
         </colgroup>
         <thead>
@@ -107,7 +114,7 @@
             @forelse($rows ?? [] as $i => $row)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td class="left">{{ $row['employee_name'] ?? '' }}</td>
+                <td class="name-cell">{{ $row['employee_name'] ?? '' }}</td>
                 <td>Nil</td>
                 <td>Nil</td>
                 <td>Nil</td>
